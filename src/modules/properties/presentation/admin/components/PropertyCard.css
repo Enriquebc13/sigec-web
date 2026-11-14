@@ -1,0 +1,425 @@
+.pcard {
+  /* Colores de la tarjeta: cámbialos aquí para ajustar todo el diseño */
+  --pcard-bg-top: #1e1233;
+  --pcard-bg-bottom: #130a22;
+  --pcard-border: rgba(133, 89, 240, 0.28);
+  --pcard-price: #b69cff;
+
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 24px;
+  background: linear-gradient(
+    180deg,
+    var(--pcard-bg-top) 0%,
+    var(--pcard-bg-bottom) 100%
+  );
+  border: 1px solid var(--pcard-border);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+  transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+
+.pcard:hover {
+  transform: translateY(-4px);
+  border-color: var(--color-primary);
+  box-shadow: 0 16px 40px rgba(133, 89, 240, 0.25);
+}
+
+/* ---------- Imagen: altura fija, la foto nunca cambia el tamaño de la tarjeta ---------- */
+.pcard__media {
+  position: relative;
+  height: 210px;
+  overflow: hidden;
+  background: var(--color-input-bg);
+}
+
+.pcard__cover {
+  position: absolute;
+  inset: 0;
+  display: block;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: zoom-in;
+}
+
+.pcard__cover img {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  animation: pcard-fade 0.25s ease;
+}
+
+@keyframes pcard-fade {
+  from {
+    opacity: 0.4;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.pcard__placeholder {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 14px;
+  color: var(--color-text-muted);
+  background: linear-gradient(135deg, #211b2e, #2c2145);
+}
+
+.pcard__type,
+.pcard__status,
+.pcard__count {
+  position: absolute;
+  z-index: 1;
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  font-weight: 700;
+  backdrop-filter: blur(6px);
+  pointer-events: none;
+}
+
+.pcard__type {
+  top: 12px;
+  left: 12px;
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.pcard__status {
+  top: 12px;
+  right: 12px;
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.pcard__status--available {
+  background: rgba(16, 185, 129, 0.85);
+}
+
+.pcard__status--reserved {
+  background: rgba(245, 158, 11, 0.9);
+  color: #1f1300;
+}
+
+.pcard__status--rented {
+  background: rgba(133, 89, 240, 0.9);
+}
+
+.pcard__status--unavailable {
+  background: rgba(107, 114, 128, 0.9);
+}
+
+.pcard__count {
+  right: 12px;
+  bottom: 12px;
+  background: rgba(0, 0, 0, 0.6);
+}
+
+/* Flechas */
+.pcard__nav {
+  position: absolute;
+  top: 50%;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding-bottom: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  font-family: inherit;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  transform: translateY(-50%);
+  transition: opacity 0.2s, background 0.2s, border-color 0.2s;
+}
+
+.pcard__nav:hover {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.pcard__nav--prev {
+  left: 10px;
+}
+
+.pcard__nav--next {
+  right: 10px;
+}
+
+/* Con mouse, las flechas aparecen al pasar sobre la imagen */
+@media (hover: hover) {
+  .pcard__nav {
+    opacity: 0;
+  }
+
+  .pcard__media:hover .pcard__nav,
+  .pcard__nav:focus-visible {
+    opacity: 1;
+  }
+}
+
+/* Puntos */
+.pcard__dots {
+  position: absolute;
+  left: 50%;
+  bottom: 14px;
+  z-index: 2;
+  display: flex;
+  gap: 6px;
+  transform: translateX(-50%);
+}
+
+.pcard__dot {
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.55);
+  cursor: pointer;
+  transition: width 0.25s, background 0.25s;
+}
+
+.pcard__dot--active {
+  width: 22px;
+  background: var(--color-primary);
+}
+
+/* ---------- Cuerpo ---------- */
+.pcard__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 8px;
+  padding: 18px 20px 20px;
+}
+
+/* Título y dirección limitados a 2 líneas, con el espacio reservado:
+   todas las tarjetas cerradas miden lo mismo */
+.pcard__title {
+  display: -webkit-box;
+  min-height: 2.5em;
+  margin: 0;
+  overflow: hidden;
+  font-size: 20px;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+.pcard__address {
+  display: -webkit-box;
+  min-height: 2.8em;
+  margin: 0;
+  overflow: hidden;
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--color-text-muted);
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+.pcard__price {
+  margin: 4px 0 0;
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--pcard-price);
+}
+
+/* ---------- Ver más / ver menos ---------- */
+.pcard__toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  height: 42px;
+  margin-top: 6px;
+  border: 1px solid var(--pcard-border);
+  border-radius: var(--radius-pill);
+  background: rgba(133, 89, 240, 0.12);
+  color: #d9ccff;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.pcard__toggle:hover {
+  background: rgba(133, 89, 240, 0.25);
+  border-color: var(--color-primary);
+}
+
+.pcard__chevron {
+  transition: transform 0.3s;
+}
+
+.pcard--open .pcard__chevron {
+  transform: rotate(180deg);
+}
+
+/* Animación de altura: la fila de la cuadrícula pasa de 0fr a 1fr */
+.pcard__expand {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.3s ease;
+}
+
+.pcard__expand--open {
+  grid-template-rows: 1fr;
+}
+
+.pcard__expand-inner {
+  min-height: 0;
+  overflow: hidden;
+  visibility: hidden;
+  /* Se oculta al terminar de cerrarse, para que no lo lean los lectores de pantalla */
+  transition: visibility 0s linear 0.3s;
+}
+
+.pcard__expand--open .pcard__expand-inner {
+  visibility: visible;
+  transition-delay: 0s;
+}
+
+.pcard__details {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin: 4px 0 0;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.pcard__detail {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.pcard__detail--wide {
+  grid-column: 1 / -1;
+}
+
+.pcard__detail dt {
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.pcard__detail dd {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+/* ---------- Acción al pie (ej. "Me interesa") ---------- */
+.pcard__action {
+  margin-top: auto;
+  padding-top: 14px;
+}
+
+.pcard__btn {
+  width: 100%;
+  height: 46px;
+  border: 2px solid var(--color-primary);
+  border-radius: var(--radius-pill);
+  background: var(--color-primary);
+  color: #fff;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.pcard__btn:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+}
+
+.pcard__btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* Solicitud pendiente */
+.pcard__btn--pending {
+  border-color: #f59e0b;
+  background: rgba(245, 158, 11, 0.18);
+  color: #fcd34d;
+  opacity: 1;
+}
+
+/* Solicitud aprobada */
+.pcard__btn--done {
+  border-color: #34d399;
+  background: rgba(16, 185, 129, 0.2);
+  color: #6ee7b7;
+  opacity: 1;
+}
+
+/* Solicitud rechazada: se puede volver a pedir */
+.pcard__btn--retry {
+  border-color: #f87171;
+  background: rgba(239, 68, 68, 0.15);
+  color: #fca5a5;
+}
+
+.pcard__btn--retry:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.28);
+}
+/* Botones de administración en la tarjeta (Editar / Eliminar) */
+.pcard__actions {
+  display: flex;
+  gap: 10px;
+}
+
+.pcard__actions .pcard__btn {
+  flex: 1;
+  height: 42px;
+}
+
+.pcard__btn--ghost {
+  background: transparent;
+}
+
+.pcard__btn--ghost:hover:not(:disabled) {
+  background: rgba(133, 89, 240, 0.25);
+}
+
+.pcard__btn--danger {
+  border-color: #dc2626;
+  background: transparent;
+  color: #fca5a5;
+}
+
+.pcard__btn--danger:hover:not(:disabled) {
+  background: rgba(220, 38, 38, 0.25);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pcard__expand,
+  .pcard__chevron,
+  .pcard__cover img {
+    transition: none;
+    animation: none;
+  }
+}

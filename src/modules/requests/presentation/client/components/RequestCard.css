@@ -1,0 +1,270 @@
+.rcard {
+  /* Mismos colores que las tarjetas de propiedad */
+  --rcard-bg-top: #1e1233;
+  --rcard-bg-bottom: #130a22;
+  --rcard-border: rgba(133, 89, 240, 0.28);
+
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 24px;
+  background: linear-gradient(
+    180deg,
+    var(--rcard-bg-top) 0%,
+    var(--rcard-bg-bottom) 100%
+  );
+  border: 1px solid var(--rcard-border);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+  transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+
+.rcard:hover {
+  transform: translateY(-4px);
+  border-color: var(--color-primary);
+  box-shadow: 0 16px 40px rgba(133, 89, 240, 0.25);
+}
+
+/* ---------- Imagen: altura fija, la foto nunca cambia el tamaño de la tarjeta ---------- */
+.rcard__media {
+  position: relative;
+  height: 200px;
+  overflow: hidden;
+  background: var(--color-input-bg);
+}
+
+.rcard__cover {
+  position: absolute;
+  inset: 0;
+  display: block;
+  color: #fff;
+  text-decoration: none;
+}
+
+.rcard__media img {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.rcard__placeholder {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 14px;
+  color: var(--color-text-muted);
+  background: linear-gradient(135deg, #211b2e, #2c2145);
+}
+
+/* Rótulo "Ver en catálogo" sobre la imagen */
+.rcard__cover-label {
+  position: absolute;
+  inset: auto 0 0 0;
+  padding: 28px 16px 12px;
+  background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.8));
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+}
+
+@media (hover: hover) {
+  .rcard__cover-label {
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .rcard__cover:hover .rcard__cover-label,
+  .rcard__cover:focus-visible .rcard__cover-label {
+    opacity: 1;
+  }
+}
+
+.rcard__status {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 1;
+  padding: 4px 14px;
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  font-weight: 700;
+  backdrop-filter: blur(6px);
+  pointer-events: none;
+}
+
+.rcard__status--pending {
+  background: rgba(245, 158, 11, 0.92);
+  color: #1f1300;
+}
+
+.rcard__status--approved {
+  background: rgba(16, 185, 129, 0.9);
+}
+
+.rcard__status--rejected {
+  background: rgba(239, 68, 68, 0.9);
+}
+
+/* ---------- Cuerpo ---------- */
+.rcard__body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 18px 20px 20px;
+}
+
+/* Título limitado a 2 líneas, con el espacio reservado: todas miden lo mismo */
+.rcard__title {
+  display: -webkit-box;
+  min-height: 2.5em;
+  margin: 0;
+  overflow: hidden;
+  font-size: 20px;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+.rcard__date {
+  margin: 0;
+  font-size: 14px;
+  color: var(--color-text-muted);
+}
+
+/* ---------- Más información ---------- */
+.rcard__toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  height: 42px;
+  margin-top: 8px;
+  border: 1px solid var(--rcard-border);
+  border-radius: var(--radius-pill);
+  background: rgba(133, 89, 240, 0.12);
+  color: #d9ccff;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.rcard__toggle:hover {
+  background: rgba(133, 89, 240, 0.25);
+  border-color: var(--color-primary);
+}
+
+.rcard__chevron {
+  transition: transform 0.3s;
+}
+
+.rcard--open .rcard__chevron {
+  transform: rotate(180deg);
+}
+
+.rcard__expand {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.3s ease;
+}
+
+.rcard__expand--open {
+  grid-template-rows: 1fr;
+}
+
+.rcard__expand-inner {
+  min-height: 0;
+  overflow: hidden;
+  visibility: hidden;
+  transition: visibility 0s linear 0.3s;
+}
+
+.rcard__expand--open .rcard__expand-inner {
+  visibility: visible;
+  transition-delay: 0s;
+}
+
+.rcard__details {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin: 8px 0 0;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.rcard__detail {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.rcard__detail--wide {
+  grid-column: 1 / -1;
+}
+
+.rcard__detail dt {
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.rcard__detail dd {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+/* ---------- Eliminar ---------- */
+.rcard__danger {
+  margin-top: 12px;
+}
+
+.rcard__delete {
+  width: 100%;
+  height: 40px;
+  border: 1px solid rgba(239, 68, 68, 0.7);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: #fca5a5;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.rcard__delete:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.2);
+}
+
+.rcard__delete:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.rcard__hint {
+  margin: 8px 0 0;
+  font-size: 13px;
+  text-align: center;
+  color: var(--color-text-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rcard__expand,
+  .rcard__chevron {
+    transition: none;
+  }
+}

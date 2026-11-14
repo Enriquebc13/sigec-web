@@ -1,0 +1,66 @@
+.glow-screen {
+  --gs-bg: #07030f;
+  --gs-light: #c9b3ff;
+  --gs-glow: rgba(133, 89, 240, 0.55);
+
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  overflow-y: auto;
+  background: linear-gradient(180deg, var(--gs-bg) 0%, var(--color-grad-2) 70%, #000 100%);
+}
+
+/* Capas decorativas fijas: se quedan en su lugar mientras se hace scroll */
+.glow-screen::before,
+.glow-screen::after {
+  content: "";
+  position: fixed;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Rayos de luz verticales + resplandor superior */
+.glow-screen::before {
+  inset: 0;
+  background:
+    radial-gradient(ellipse 70% 40% at 50% 0%, rgba(133, 89, 240, 0.35), transparent 70%),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0 38px,
+      rgba(133, 89, 240, 0.05) 38px 40px
+    );
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, transparent 65%);
+  mask-image: linear-gradient(180deg, #000 0%, transparent 65%);
+}
+
+/* Arco luminoso que asoma arriba (versión suave del hero del home) */
+.glow-screen::after {
+  top: -52vw;
+  left: 50%;
+  width: min(1500px, 150vw);
+  aspect-ratio: 1;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: transparent;
+  box-shadow:
+    inset 0 2px 2px rgba(255, 255, 255, 0.6),
+    inset 0 6px 24px var(--gs-light),
+    inset 0 20px 80px var(--gs-glow);
+  opacity: 0.55;
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, transparent 60%);
+  mask-image: linear-gradient(180deg, #000 0%, transparent 60%);
+}
+
+.glow-screen__content {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 460px;
+  padding: 20px 20px 35px;
+}
+
+.glow-screen__content--wide {
+  max-width: 1800px;
+  padding: 20px 32px 40px;
+}

@@ -1,0 +1,405 @@
+.about {
+  --font-serif: "Arial", "Playfair Display", Georgia, "Times New Roman", serif;
+  min-height: 100vh;
+  color: var(--color-text);
+  background: linear-gradient(
+    180deg,
+    var(--color-grad-1) 0%,
+    var(--color-grad-2) 45%,
+    var(--color-grad-3) 100%
+  );
+}
+
+/* ---------- Barra superior ---------- */
+/* .about__bar {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px 24px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+} */
+ .about__bar {
+  position: relative;
+  z-index: 5;
+  width: 100%;
+  max-width: 1450px;
+  margin: 0 auto;
+  padding: 24px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+}
+
+.about__back {
+  padding: 10px 20px;
+  border-radius: var(--radius-pill);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  color: #fff;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.about__back:hover {
+  border-color: var(--color-primary);
+  background: rgba(133, 89, 240, 0.3);
+}
+
+/* .about__brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 2px;
+} */
+ .about__brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #fff;
+  text-decoration: none;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  flex-shrink: 0;
+}
+
+/* .about__brand img {
+  padding: 3px;
+  border-radius: 10px;
+  background: #fff;
+} */
+.about__brand img {
+  padding: 3px;
+  border-radius: 10px;
+  background: #fff;
+}
+.about__container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 32px;
+}
+
+/* ---------- Hero ---------- */
+.about__hero {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  align-items: center;
+  gap: 40px;
+  padding: 72px 0 56px;
+}
+
+.about__eyebrow {
+  margin: 0 0 12px;
+  font-family: var(--font-serif);
+  font-size: 18px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.about__eyebrow--center {
+  text-align: center;
+}
+
+.about__title {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: clamp(56px, 9vw, 110px);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.06em;
+}
+
+.about__subtitle {
+  margin: 12px 0 24px;
+  font-size: clamp(18px, 2.4vw, 24px);
+  line-height: 1.4;
+  color: var(--color-text-muted);
+}
+
+.about__lead {
+  margin: 0;
+  max-width: 560px;
+  font-size: 18px;
+  line-height: 1.6;
+}
+
+.about__hero-logo {
+  display: grid;
+  place-items: center;
+}
+
+.about__hero-logo img {
+  width: min(100%, 320px);
+  height: auto;
+}
+
+/* ---------- Secciones ---------- */
+.about__section {
+  padding: 40px 0;
+}
+
+.about__heading {
+  margin: 0 0 32px;
+  text-align: center;
+  font-family: var(--font-serif);
+  font-size: clamp(28px, 4vw, 44px);
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* ---------- Misión y Visión ---------- */
+.about__purpose {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.about__purpose-card {
+  padding: 32px 28px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 3px solid var(--color-primary);
+}
+
+.about__purpose-head {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.about__purpose-head .about__card-icon {
+  margin-bottom: 0;
+  flex-shrink: 0;
+}
+
+.about__purpose-title {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: clamp(24px, 3vw, 32px);
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.about__purpose-card p {
+  margin: 0;
+  font-size: 17px;
+  line-height: 1.7;
+  color: var(--color-text-muted);
+}
+
+/* ---------- Qué ofrece ---------- */
+.about__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.about__card {
+  padding: 28px 24px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.about__card-icon {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  margin-bottom: 16px;
+  border-radius: 16px;
+  background: var(--color-input-bg);
+  font-size: 28px;
+}
+
+.about__card h3 {
+  margin: 0 0 8px;
+  font-size: 20px;
+}
+
+.about__card p {
+  margin: 0;
+  line-height: 1.5;
+  color: var(--color-text-muted);
+}
+
+/* ---------- Tecnología ---------- */
+.about__chips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.about__chip {
+  padding: 10px 22px;
+  border-radius: var(--radius-pill);
+  background: rgba(133, 89, 240, 0.18);
+  border: 1px solid rgba(133, 89, 240, 0.45);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+/* ---------- Equipo ---------- */
+.about__team {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 20px;
+}
+
+.about__member {
+  padding: 28px 20px;
+  text-align: center;
+  border-radius: 24px;
+  background: var(--color-input-bg);
+}
+
+.about__avatar {
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 16px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.about__member h3 {
+  margin: 0 0 4px;
+  font-size: 18px;
+}
+
+.about__member p {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+
+.about__advisor {
+  margin: 28px 0 0;
+  text-align: center;
+  color: var(--color-text-muted);
+}
+
+.about__advisor strong {
+  color: var(--color-text);
+}
+
+/* ---------- Footer ---------- */
+.about__footer {
+  padding-top: 40px;
+  text-align: center;
+  font-size: 15px;
+  color: var(--color-text-muted);
+}
+
+/* ---------- Iconos Lucide ---------- */
+
+.about__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.about__card-icon {
+  color: #c9b3ff;
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  margin-bottom: 16px;
+  border-radius: 16px;
+  background: rgba(133, 89, 240, 0.16);
+  border: 1px solid rgba(133, 89, 240, 0.25);
+}
+
+.about__purpose-head .about__card-icon {
+  margin-bottom: 0;
+}
+
+.about__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  color: #e2d5ff;
+}
+
+.about__chip svg {
+  color: #b99aff;
+  flex-shrink: 0;
+}
+
+.about__team-heading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 22px;
+  color: #c9b3ff;
+}
+
+.about__team-heading .about__eyebrow {
+  margin: 0;
+}
+
+/* Enlace activo de Acerca de */
+.landing__links .landing__link--active {
+  opacity: 1;
+}
+
+.landing__links .landing__link--active::after {
+  opacity: 1;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 800px) {
+  .about__hero {
+    grid-template-columns: 1fr;
+    text-align: center;
+    padding-top: 40px;
+  }
+
+  .about__lead {
+    margin: 0 auto;
+  }
+
+  .about__hero-logo {
+    order: -1;
+  }
+
+  .about__hero-logo img {
+    width: 180px;
+  }
+
+  .about__purpose-card {
+    padding: 26px 22px;
+  }
+   .about__bar {
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 20px;
+    gap: 18px;
+  }
+
+  .about__bar .landing__links {
+    order: 3;
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 18px;
+  }
+}

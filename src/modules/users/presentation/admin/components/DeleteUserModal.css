@@ -1,0 +1,25 @@
+.modal--danger {
+  border-color: rgba(239, 68, 68, 0.5);
+  box-shadow: 0 24px 80px rgba(239, 68, 68, 0.2);
+}
+
+.modal__text {
+  margin: 0 0 24px;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--color-text-muted);
+}
+
+.modal__text strong {
+  color: var(--color-text);
+}
+
+.modal__btn--danger {
+  border-color: #dc2626;
+  background: #dc2626;
+}
+
+.modal__btn--danger:hover:not(:disabled) {
+  border-color: #b91c1c;
+  background: #b91c1c;
+}

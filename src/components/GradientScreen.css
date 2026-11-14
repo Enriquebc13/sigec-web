@@ -1,0 +1,23 @@
+.gradient-screen {
+  min-height: 100vh;
+  background: linear-gradient(
+    180deg,
+    var(--color-grad-1) 0%,
+    var(--color-grad-2) 50%,
+    var(--color-grad-3) 100%
+  );
+  display: flex;
+  justify-content: center;
+  overflow-y: auto;
+}
+
+.gradient-screen__content {
+  width: 100%;
+  max-width: 460px;
+  padding: 20px 20px 35px;
+  position: relative;
+}
+.gradient-screen__content--wide {
+  max-width: 1800px;
+  padding: 20px 32px 40px;
+}

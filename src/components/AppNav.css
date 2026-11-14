@@ -1,0 +1,100 @@
+.appnav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 28px;
+  margin-bottom: 8px;
+  padding: 4px 0 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.appnav__brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-right: auto; /* empuja los enlaces y el botón a la derecha */
+  color: #fff;
+  text-decoration: none;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+.appnav__brand img {
+  padding: 3px;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.appnav__links {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+.appnav__links a {
+  position: relative;
+  padding: 6px 0;
+  color: #fff;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.appnav__links a:hover,
+.appnav__link--active {
+  opacity: 1;
+}
+
+/* Subrayado del enlace actual (solo con hideCurrent={false}) */
+.appnav__link--active::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -2px;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--color-primary),
+    transparent
+  );
+}
+
+.appnav__logout {
+  padding: 10px 20px;
+  border-radius: var(--radius-pill);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  background: transparent;
+  color: #fff;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.appnav__logout:hover {
+  border-color: var(--color-primary);
+  background: rgba(133, 89, 240, 0.3);
+}
+
+/* Móvil: los enlaces pasan a una segunda fila con scroll horizontal */
+@media (max-width: 800px) {
+  .appnav__links {
+    order: 3;
+    width: 100%;
+    gap: 22px;
+    padding-bottom: 4px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .appnav__links a {
+    white-space: nowrap;
+  }
+}
