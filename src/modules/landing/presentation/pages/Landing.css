@@ -1,3 +1,11 @@
+/* =========================================================
+   Landing
+   Orden: base · navbar · botones · pestaña · hero · sesión ·
+          carrusel · contenido · bienvenida (logo + texto) ·
+          tarjetas · pasos · FAQ · CTA · footer ·
+          responsive (junto al final) · movimiento reducido
+   ========================================================= */
+
 html {
   scroll-behavior: smooth;
 }
@@ -15,8 +23,7 @@ html {
   overflow-x: hidden;
 }
 
-/* Navbar */
-
+/* ---------- Navbar ---------- */
 .landing__nav {
   position: fixed;
   top: 0;
@@ -83,12 +90,7 @@ html {
   bottom: -2px;
   height: 2px;
   border-radius: 2px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    var(--color-primary),
-    transparent
-  );
+  background: linear-gradient(90deg, transparent, var(--color-primary), transparent);
   opacity: 0;
   transition: opacity 0.2s;
 }
@@ -101,8 +103,15 @@ html {
   justify-self: end;
 }
 
-/* Botones */
+/* Botones del navbar (Iniciar sesión + Registrarse) */
+.landing__nav-actions {
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
 
+/* ---------- Botones ---------- */
 .landing__btn {
   display: inline-flex;
   align-items: center;
@@ -118,11 +127,7 @@ html {
   font-size: 15px;
   font-weight: 600;
   text-decoration: none;
-  transition:
-    transform 0.15s,
-    box-shadow 0.2s,
-    background 0.2s,
-    border-color 0.2s;
+  transition: transform 0.15s, box-shadow 0.2s, background 0.2s, border-color 0.2s;
 }
 
 .landing__btn:hover {
@@ -158,8 +163,7 @@ button.landing__btn {
   cursor: pointer;
 }
 
-/* Pestaña lateral */
-
+/* ---------- Pestaña lateral ---------- */
 .landing__side-tab {
   position: fixed;
   right: 0;
@@ -186,8 +190,7 @@ button.landing__btn {
   box-shadow: -4px 4px 16px rgba(0, 0, 0, 0.3);
 }
 
-/* Hero */
-
+/* ---------- Hero ---------- */
 .landing__hero {
   position: relative;
   min-height: 100svh;
@@ -238,16 +241,8 @@ button.landing__btn {
     transparent 0 38px,
     rgba(133, 89, 240, 0.04) 38px 40px
   );
-  -webkit-mask-image: radial-gradient(
-    ellipse 60% 55% at 50% 22%,
-    #000,
-    transparent 75%
-  );
-  mask-image: radial-gradient(
-    ellipse 60% 55% at 50% 22%,
-    #000,
-    transparent 75%
-  );
+  -webkit-mask-image: radial-gradient(ellipse 60% 55% at 50% 22%, #000, transparent 75%);
+  mask-image: radial-gradient(ellipse 60% 55% at 50% 22%, #000, transparent 75%);
 }
 
 .landing__hero-content {
@@ -274,12 +269,7 @@ button.landing__btn {
 .landing__title-main {
   display: block;
   font-size: clamp(40px, 7vw, 74px);
-  background: linear-gradient(
-    90deg,
-    #fff 0%,
-    #b79bff 50%,
-    var(--color-primary) 100%
-  );
+  background: linear-gradient(90deg, #fff 0%, #b79bff 50%, var(--color-primary) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: white;
@@ -307,8 +297,25 @@ button.landing__btn {
   margin-top: 36px;
 }
 
-/* Aviso de sesión activa */
+/* Texto bajo los botones del hero */
+.landing__hero-note {
+  margin: 20px 0 0;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.8);
+}
 
+.landing__hero-note a {
+  color: var(--ch-light);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.landing__hero-note a:hover {
+  color: #fff;
+}
+
+/* ---------- Aviso de sesión activa ---------- */
 .landing__session {
   display: inline-flex;
   align-items: center;
@@ -349,8 +356,7 @@ button.landing__btn {
   overflow-wrap: anywhere;
 }
 
-/* Controles del carrusel */
-
+/* ---------- Controles del carrusel ---------- */
 .landing__controls {
   position: absolute;
   bottom: 36px;
@@ -405,17 +411,11 @@ button.landing__btn {
   background: var(--color-primary);
 }
 
-/* Contenido */
-
+/* ---------- Contenido ---------- */
 .landing__body {
   position: relative;
   z-index: 2;
-  background: linear-gradient(
-    180deg,
-    var(--ch-bg) 0%,
-    var(--color-grad-2) 60%,
-    #000 100%
-  );
+  background: linear-gradient(180deg, var(--ch-bg) 0%, var(--color-grad-2) 60%, #000 100%);
   padding-bottom: 40px;
 }
 
@@ -425,10 +425,14 @@ button.landing__btn {
   padding: 0 24px;
 }
 
-.landing__intro {
-  max-width: 760px;
-  margin: 0 auto;
-  padding: 88px 0 48px;
+/* Títulos de sección compartidos */
+.landing__intro h2,
+.landing__section h2,
+.landing__cta h2 {
+  margin: 0 0 20px;
+  font-size: clamp(26px, 4vw, 38px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
   text-align: center;
 }
 
@@ -441,14 +445,24 @@ button.landing__btn {
   color: var(--color-primary);
 }
 
-.landing__intro h2,
-.landing__section h2,
-.landing__cta h2 {
-  margin: 0 0 20px;
-  font-size: clamp(26px, 4vw, 38px);
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  text-align: center;
+/* ---------- Bienvenida: logo animado + texto ---------- */
+.landing__intro {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 64px;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 88px 0 48px;
+}
+
+.landing__intro-brand {
+  display: flex;
+  justify-content: center;
+}
+
+.landing__intro h2 {
+  text-align: left;
 }
 
 .landing__intro p:last-child {
@@ -458,6 +472,7 @@ button.landing__btn {
   color: var(--color-text-muted);
 }
 
+/* ---------- Secciones ---------- */
 .landing__section {
   padding: 40px 0;
   scroll-margin-top: 90px;
@@ -467,8 +482,13 @@ button.landing__btn {
   margin-bottom: 32px;
 }
 
-/* Tarjetas */
+/* Sección angosta (FAQ) */
+.landing__section--narrow {
+  max-width: 800px;
+  margin: 0 auto;
+}
 
+/* ---------- Tarjetas ---------- */
 .landing__grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -483,11 +503,7 @@ button.landing__btn {
   border-radius: 20px;
   background: var(--ch-glass);
   border: 1px solid var(--ch-border);
-  transition:
-    transform 0.2s,
-    background 0.2s,
-    border-color 0.2s,
-    box-shadow 0.2s;
+  transition: transform 0.2s, background 0.2s, border-color 0.2s, box-shadow 0.2s;
 }
 
 .landing__card:hover {
@@ -504,11 +520,7 @@ button.landing__btn {
   height: 54px;
   margin-bottom: 4px;
   border-radius: 16px;
-  background: linear-gradient(
-    135deg,
-    rgba(133, 89, 240, 0.4),
-    rgba(36, 58, 99, 0.6)
-  );
+  background: linear-gradient(135deg, rgba(133, 89, 240, 0.4), rgba(36, 58, 99, 0.6));
   border: 1px solid var(--ch-border);
   color: var(--ch-light);
 }
@@ -526,8 +538,7 @@ button.landing__btn {
   color: var(--color-text-muted);
 }
 
-/* Pasos */
-
+/* ---------- Pasos ---------- */
 .landing__steps {
   list-style: none;
   margin: 0 auto;
@@ -561,11 +572,7 @@ button.landing__btn {
   width: 48px;
   height: 48px;
   border-radius: 14px;
-  background: linear-gradient(
-    180deg,
-    #a98bff 0%,
-    var(--color-primary) 100%
-  );
+  background: linear-gradient(180deg, #a98bff 0%, var(--color-primary) 100%);
   border: 1px solid rgba(255, 255, 255, 0.35);
   box-shadow: none;
   font-size: 22px;
@@ -582,110 +589,6 @@ button.landing__btn {
   margin: 0;
   font-size: 14px;
   color: var(--color-text-muted);
-}
-
-/* CTA final y footer */
-
-.landing__cta {
-  margin: 48px 0 24px;
-  padding: 56px 24px;
-  text-align: center;
-  border-radius: 28px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid var(--ch-border);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(12px);
-}
-
-.landing__cta h2 {
-  margin-bottom: 8px;
-}
-
-.landing__cta p {
-  margin: 0 0 28px;
-  font-size: 17px;
-  color: var(--color-text-muted);
-}
-
-.landing__footer {
-  padding-top: 16px;
-  text-align: center;
-  font-size: 14px;
-  color: var(--color-text-muted);
-}
-
-/* Responsive */
-
-@media (max-width: 1000px) {
-  .landing__links {
-    display: none;
-  }
-
-  .landing__nav,
-  .landing__nav--scrolled {
-    grid-template-columns: 1fr auto;
-  }
-}
-
-@media (max-width: 800px) {
-  .landing__nav,
-  .landing__nav--scrolled {
-    padding: 12px 20px;
-  }
-
-  .landing__side-tab {
-    display: none;
-  }
-
-  .landing__hero {
-    padding: 120px 20px 130px;
-  }
-
-  .landing__btn {
-    height: 46px;
-    padding: 0 24px;
-    font-size: 14px;
-  }
-}
-/* =========================================================
-   AGREGAR AL FINAL DE Landing.css
-   ========================================================= */
-
-/* Botones del navbar (Iniciar sesión + Registrarse) */
-.landing__nav-actions {
-  justify-self: end;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-/* Texto bajo los botones del hero */
-.landing__hero-note {
-  margin: 20px 0 0;
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.8);
-}
-
-.landing__hero-note a {
-  color: var(--ch-light);
-  font-weight: 600;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
-
-.landing__hero-note a:hover {
-  color: #fff;
-}
-
-/* Botones del CTA final, un poco más separados del texto */
-.landing__actions--cta {
-  margin-top: 0;
-}
-
-/* Sección angosta (FAQ) */
-.landing__section--narrow {
-  max-width: 800px;
-  margin: 0 auto;
 }
 
 /* ---------- FAQ desplegable ---------- */
@@ -751,6 +654,87 @@ button.landing__btn {
   color: var(--color-text-muted);
 }
 
+/* ---------- CTA final y footer ---------- */
+.landing__cta {
+  margin: 48px 0 24px;
+  padding: 56px 24px;
+  text-align: center;
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--ch-border);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(12px);
+}
+
+.landing__cta h2 {
+  margin-bottom: 8px;
+}
+
+.landing__cta p {
+  margin: 0 0 28px;
+  font-size: 17px;
+  color: var(--color-text-muted);
+}
+
+/* Botones del CTA final: sin margen superior extra */
+.landing__actions--cta {
+  margin-top: 0;
+}
+
+.landing__footer {
+  padding-top: 16px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--color-text-muted);
+}
+
+/* =========================================================
+   Responsive (de mayor a menor)
+   ========================================================= */
+@media (max-width: 1000px) {
+  .landing__links {
+    display: none;
+  }
+
+  .landing__nav,
+  .landing__nav--scrolled {
+    grid-template-columns: 1fr auto;
+  }
+}
+
+@media (max-width: 800px) {
+  .landing__nav,
+  .landing__nav--scrolled {
+    padding: 12px 20px;
+  }
+
+  .landing__side-tab {
+    display: none;
+  }
+
+  .landing__hero {
+    padding: 120px 20px 130px;
+  }
+
+  .landing__btn {
+    height: 46px;
+    padding: 0 24px;
+    font-size: 14px;
+  }
+
+  /* Bienvenida en una columna: logo arriba, texto centrado debajo */
+  .landing__intro {
+    grid-template-columns: 1fr;
+    gap: 32px;
+    padding: 64px 0 32px;
+    text-align: center;
+  }
+
+  .landing__intro h2 {
+    text-align: center;
+  }
+}
+
 @media (max-width: 560px) {
   /* En móvil el botón "Iniciar sesión" del navbar se oculta: queda "Registrarse" */
   .landing__nav-actions .landing__btn--ghost {
@@ -766,6 +750,7 @@ button.landing__btn {
     padding: 0 18px 18px;
   }
 }
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;

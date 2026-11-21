@@ -1,6 +1,6 @@
 import type {
-  Property,
   PropertyId,
+  UpdatePropertyResult,
 } from "../../domain/entities/property.entity";
 import type { PropertyRepository } from "../../domain/interfaces/property.repository";
 import type { UpdatePropertyDto } from "../dtos/update-property.dto";
@@ -12,7 +12,10 @@ export class UpdatePropertyUseCase {
     this.repository = repository;
   }
 
-  execute(id: PropertyId, dto: UpdatePropertyDto): Promise<Property> {
+  execute(
+    id: PropertyId,
+    dto: UpdatePropertyDto,
+  ): Promise<UpdatePropertyResult> {
     if (Object.keys(dto).length === 0) {
       throw new Error("No hay cambios que guardar");
     }

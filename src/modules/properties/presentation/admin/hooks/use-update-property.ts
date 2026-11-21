@@ -2,7 +2,10 @@ import { useState } from "react";
 import { ApiError } from "../../../../../core/http/api-client";
 import type { UpdatePropertyDto } from "../../../application/dtos/update-property.dto";
 import { UpdatePropertyUseCase } from "../../../application/usecases/update-property.use-case";
-import type { PropertyId } from "../../../domain/entities/property.entity";
+import type {
+  AutoRejectedRequest,
+  PropertyId,
+} from "../../../domain/entities/property.entity";
 import { PropertyApiRepository } from "../../../infrastructure/repositories/property-api.repository";
 
 const updatePropertyUseCase = new UpdatePropertyUseCase(
@@ -22,19 +25,25 @@ export function useUpdateProperty() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  /** Devuelve true si se guardó bien */
+  /**
+   * Devuelve null si falló; si se guardó bien, las solicitudes que la API
+   * rechazó automáticamente (lista vacía si no hubo ninguna).
+   */
   const update = async (
     id: PropertyId,
     dto: UpdatePropertyDto,
-  ): Promise<boolean> => {
+  ): Promise<AutoRejectedRequest[] | null> => {
     setLoading(true);
     setError(null);
     try {
-      await updatePropertyUseCase.execute(id, dto);
-      return true;
+      const { autoRejectedRequests } = await updatePropertyUseCase.execute(
+        id,
+        dto,
+      );
+      return autoRejectedRequests;
     } catch (err) {
       setError(toMessage(err));
-      return false;
+      return null;
     } finally {
       setLoading(false);
     }

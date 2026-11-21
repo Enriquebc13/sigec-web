@@ -1,0 +1,82 @@
+@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&display=swap");
+
+.lg{
+  --purple:#5E35B1; --lilac:#d9c8ff; --amber:#ffc857;
+  container-type:inline-size; position:relative; width:100%; aspect-ratio:16/9;
+  overflow:hidden; border-radius:20px; color:#fff;
+  font-family:"Bricolage Grotesque",system-ui,sans-serif;
+  background:linear-gradient(160deg,#5E35B1 0%,#1A0B2E 55%,#000 100%);
+}
+.lg p{margin:0}
+
+.lg-orb{position:absolute;border-radius:50%;filter:blur(40px);opacity:.55;animation:lg-drift 12s ease-in-out infinite alternate}
+.lg-o1{width:38%;aspect-ratio:1;left:-8%;top:-12%;background:#7c4dff}
+.lg-o2{width:30%;aspect-ratio:1;right:-6%;bottom:-14%;background:#ffc857;opacity:.28;animation-duration:15s}
+.lg-o3{width:22%;aspect-ratio:1;right:22%;top:8%;background:#b388ff;opacity:.35;animation-duration:10s}
+@keyframes lg-drift{to{transform:translate(6cqw,4cqw) scale(1.15)}}
+
+.lg-scene{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:6%;
+  animation:lg-scene 16s infinite backwards;animation-delay:var(--d)}
+@keyframes lg-scene{
+  0%{opacity:0;visibility:hidden}2%{opacity:1;visibility:visible}
+  23%{opacity:1;visibility:visible}25%{opacity:0;visibility:hidden}100%{opacity:0;visibility:hidden}}
+
+.lg-in{animation:lg-rise 16s infinite backwards;animation-delay:calc(var(--d) + var(--s,0s))}
+@keyframes lg-rise{0%{opacity:0;transform:translateY(5cqw)}4%{opacity:1;transform:none}22%{opacity:1;transform:none}25%,100%{opacity:0}}
+
+.lg-mid{font-size:4.6cqw;font-weight:700;letter-spacing:-.01em}
+.lg-sub{font-size:2.3cqw;font-weight:500;color:var(--lilac);margin-top:2.4cqw}
+
+/* Escena 1: formulario que se escribe solo */
+.lg-card{width:44cqw;margin-top:3cqw;padding:2.6cqw 3cqw;text-align:left;display:grid;gap:2cqw;
+  background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:2.4cqw}
+.lg-field{display:grid;gap:.6cqw}
+.lg-field small{font-size:1.8cqw;font-weight:500;color:var(--lilac)}
+.lg-field > span{display:block;padding:1.3cqw 1.8cqw;border-radius:1.2cqw;background:rgba(0,0,0,.28);font-size:2.6cqw;font-weight:700;min-height:5.6cqw}
+.lg-type{display:block;animation:lg-type 16s infinite backwards;animation-delay:calc(var(--d) + var(--o,0s));animation-timing-function:steps(var(--n,10))}
+@keyframes lg-type{
+  0%,5%{clip-path:inset(0 100% 0 0)}12%{clip-path:inset(0 0 0 0)}
+  23%{clip-path:inset(0 0 0 0)}25%,100%{clip-path:inset(0 100% 0 0)}}
+
+/* Escena 2: botón + cursor */
+.lg-btnwrap{position:relative;margin-top:3.5cqw}
+.lg-btn{position:relative;display:flex;align-items:center;height:8cqw;padding:0 5cqw;border-radius:99px;background:var(--amber);color:#1a0b2e;
+  font-size:3cqw;font-weight:800;white-space:nowrap;animation:lg-press 16s infinite backwards;animation-delay:var(--d)}
+.lg-btn::after{content:"";position:absolute;inset:0;border-radius:99px;border:.5cqw solid var(--amber);
+  animation:lg-ripple 16s infinite backwards;animation-delay:var(--d)}
+@keyframes lg-press{0%,9%{transform:none}10.5%{transform:scale(.94)}12%,100%{transform:none}}
+@keyframes lg-ripple{0%,10%{opacity:0;transform:scale(1)}11%{opacity:.7;transform:scale(1)}17%{opacity:0;transform:scale(1.35,1.9)}100%{opacity:0}}
+.lg-cursor{position:absolute;left:58%;top:52%;width:5cqw;height:5cqw;filter:drop-shadow(0 .4cqw .6cqw rgba(0,0,0,.45));
+  animation:lg-cursor 16s infinite backwards;animation-delay:var(--d)}
+@keyframes lg-cursor{
+  0%,3%{opacity:0;transform:translate(12cqw,9cqw)}6%{opacity:1}9%{opacity:1;transform:translate(0,0)}
+  10.5%{transform:translate(0,0) scale(.82)}12%{transform:translate(0,0) scale(1)}
+  22%{opacity:1}25%,100%{opacity:0}}
+
+/* Escena 3: verificación */
+.lg-badge{width:16cqw}
+.lg-badge svg{display:block;width:100%;height:auto}
+.lg-ring{animation:lg-ring 16s infinite backwards;animation-delay:var(--d)}
+@keyframes lg-ring{0%{opacity:0}3%{opacity:1}11%{opacity:1}12%,100%{opacity:0}}
+.lg-spin{transform-box:fill-box;transform-origin:center;animation:lg-spin 1s linear infinite}
+@keyframes lg-spin{to{transform:rotate(360deg)}}
+.lg-ok{transform-box:fill-box;transform-origin:center;animation:lg-ok 16s infinite backwards;animation-delay:var(--d)}
+@keyframes lg-ok{0%,11%{opacity:0;transform:scale(.4)}14%{opacity:1;transform:scale(1)}23%{opacity:1}25%,100%{opacity:0}}
+.lg-swap{display:grid;margin-top:3cqw}
+.lg-swap > *{grid-area:1/1}
+.lg-sw-a{animation:lg-sw-a 16s infinite backwards;animation-delay:var(--d)}
+.lg-sw-b{animation:lg-sw-b 16s infinite backwards;animation-delay:var(--d)}
+@keyframes lg-sw-a{0%{opacity:0}3%{opacity:1}10%{opacity:1}11.5%,100%{opacity:0}}
+@keyframes lg-sw-b{0%,11%{opacity:0}13%{opacity:1}23%{opacity:1}25%,100%{opacity:0}}
+
+/* Escena 4: roles */
+.lg-row{display:flex;gap:3cqw;margin-top:3.5cqw}
+.lg-role{width:26cqw;padding:2.6cqw;text-align:left;border-radius:2.2cqw;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2)}
+.lg-role b{display:block;font-size:3cqw}
+.lg-role span{display:block;margin-top:.8cqw;font-size:2cqw;line-height:1.35;color:var(--lilac)}
+
+@media (prefers-reduced-motion:reduce){
+  .lg *,.lg *::after{animation:none!important}
+  .lg-scene{opacity:0;visibility:hidden}
+  .lg-scene:last-of-type{opacity:1;visibility:visible}
+}

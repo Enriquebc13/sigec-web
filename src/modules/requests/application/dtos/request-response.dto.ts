@@ -7,4 +7,8 @@ export interface RequestResponseDto {
   propertyId: string;
   status: RequestStatus;
   createdAt: string;
+  /** Número si la solicitud está PENDING; null si ya fue resuelta */
+  posicionListaEspera?: number | null;
+  /** true si el propio solicitante canceló la solicitud */
+  cancelledByApplicant?: boolean;
 }

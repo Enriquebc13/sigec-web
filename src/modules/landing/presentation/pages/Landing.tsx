@@ -16,8 +16,11 @@ import logoSigec from "../../../../assets/logo-sigec.svg";
 import { HOME_BY_ROLE } from "../../../auth/presentation/home-by-role";
 import { useAuth } from "../../../auth/presentation/hooks/useAuth";
 import { PropertyCatalog } from "../../../properties/presentation/shared/PropertyCatalog";
+import LoginBrand from "../../../../components/brand/LoginBrand";
 
 import "./Landing.css";
+import { RevealAll } from "../../../../components/Reveal";
+import LoginGuide from "../../../../components/promo/LoginGuide";
 
 const imageModules = import.meta.glob<string>(
   "../../../../assets/images/*.{png,jpg,jpeg,webp,avif}",
@@ -32,23 +35,23 @@ const slides = Object.entries(imageModules)
 const features = [
   {
     icon: Search,
-    title: "Consulta los espacios",
-    text: "Revisa locales, oficinas y bodegas con su precio, ubicación, dimensiones y fotografías.",
+    title: "Explora los espacios",
+    text: "Consulta locales, oficinas y bodegas disponibles. Revisa sus precios, ubicación, dimensiones y fotografías para encontrar el espacio que buscas.",
   },
   {
     icon: ClipboardList,
-    title: "Envía solicitudes",
-    text: "Muestra tu interés en los espacios que te gusten, todos los que quieras.",
+    title: "Muestra tu interés",
+    text: "Selecciona las propiedades que te interesen, proporciona tus datos de contacto y envía tu solicitud para que un administrador pueda darle seguimiento.",
   },
   {
     icon: Clock3,
-    title: "Lista de espera",
-    text: "Si un espacio no está disponible, queda registrada tu solicitud y puedes ver tu posición.",
+    title: "Consulta tu posición en la lista de espera",
+    text: "Si varias personas están interesadas en una misma propiedad, podrás conocer el lugar que ocupas en la fila y consultar cómo avanza tu posición.",
   },
   {
     icon: User,
-    title: "Tu información en un lugar",
-    text: "Da seguimiento a tus solicitudes y administra tu perfil desde tu cuenta.",
+    title: "Da seguimiento a tus solicitudes",
+    text: "Consulta el estado de tus solicitudes desde tu cuenta y mantente al tanto de su seguimiento. También puedes administrar tu información de perfil.",
   },
 ];
 
@@ -78,19 +81,31 @@ const steps = [
 const faqs = [
   {
     q: "¿Necesito una cuenta para ver los espacios?",
-    a: "Puedes explorar el catálogo sin iniciar sesión. Para enviar una solicitud y darle seguimiento necesitas crear una cuenta.",
+    a: "No. Puedes explorar el catálogo y consultar la información de los locales, oficinas y bodegas sin iniciar sesión. Para mostrar interés en una propiedad y dar seguimiento a tu solicitud, necesitas tener una cuenta.",
   },
   {
     q: "¿Cómo puedo solicitar un espacio?",
-    a: "Ingresa al catálogo de espacios disponibles, selecciona el local, oficina o bodega que te interese y consulta su información. Si deseas rentarlo, utiliza la opción para enviar una solicitud. Una vez enviada, podrás consultar su estado desde el apartado “Mis solicitudes”.",
+    a: "Ingresa al catálogo, selecciona la propiedad que te interese y utiliza la opción «Me interesa». Deberás proporcionar tus datos de contacto para que el administrador pueda dar seguimiento a tu solicitud. Después podrás consultar su estado desde el apartado «Mis solicitudes».",
   },
   {
     q: "¿Qué significa estar en lista de espera?",
-    a: "Significa que has mostrado interés en un espacio que actualmente no se encuentra disponible y tu solicitud queda registrada para cuando exista disponibilidad. Puedes consultar tu posición en la lista de espera desde tu cuenta.",
+    a: "Significa que personas han mostrado interés en una misma propiedad. El sistema organiza las solicitudes en una fila y te permite consultar el lugar que ocupas para que el administrador pueda atender a cada interesado en orden.",
   },
   {
-    q: "¿Puedo enviar solicitudes para diferentes espacios?",
-    a: "Sí, puedes mostrar interés en diferentes espacios. Cada solicitud se consulta de forma individual desde “Mis solicitudes”, lo que te permite llevar un seguimiento organizado.",
+    q: "¿Cómo funciona mi posición en la lista de espera?",
+    a: "Puedes consultar tu lugar en la fila desde el apartado «Lista de espera». Si una persona que está antes que tú es rechazada o no continúa con el proceso, avanzarás automáticamente de posición.",
+  },
+  {
+    q: "¿Qué pasa si la propiedad se renta antes de que llegue mi turno?",
+    a: "Si la propiedad se renta antes de que puedas ser atendido, recibirás una notificación mediante los datos de contacto que proporcionaste al mostrar interés.",
+  },
+  {
+    q: "¿Cómo sé cuándo es mi turno?",
+    a: "Cuando llegues al primer lugar de la lista, el sistema te indicará que eres el siguiente y que un administrador se pondrá en contacto contigo. Puedes consultar esta información desde «Lista de espera».",
+  },
+  {
+    q: "¿Puedo mostrar interés en diferentes espacios?",
+    a: "Sí. Puedes mostrar interés en diferentes propiedades. Cada solicitud se registra individualmente y puedes consultar su seguimiento desde «Mis solicitudes» y «Lista de espera».",
   },
 ];
 
@@ -132,7 +147,20 @@ export function Landing() {
   }, []);
 
   return (
-    <div className="landing">
+    <RevealAll
+      className="landing"
+      selector={[
+        ".landing__hero-content > :not(h1)", // sesión, tagline, botones, nota
+        ".landing__title > span",            // las dos líneas del título
+        ".landing__intro > *",               // logo animado + texto de bienvenida
+        ".landing__section > h2",
+        "#catalogo > :not(h2)",              // el catálogo completo
+        ".landing__grid > *",                // tarjetas, en cascada
+        ".landing__steps > *",               // pasos, en cascada
+        ".landing__faq-list > *",
+        ".landing__cta > *",
+      ].join(", ")}
+    >
       <header
         className={`landing__nav${scrolled ? " landing__nav--scrolled" : ""}`}
       >
@@ -184,9 +212,8 @@ export function Landing() {
           {slides.map((src, i) => (
             <div
               key={src}
-              className={`landing__slide${
-                i === current ? " landing__slide--active" : ""
-              }`}
+              className={`landing__slide${i === current ? " landing__slide--active" : ""
+                }`}
               style={{ backgroundImage: `url(${src})` }}
             />
           ))}
@@ -272,9 +299,8 @@ export function Landing() {
                 <button
                   key={src}
                   type="button"
-                  className={`landing__dot${
-                    i === current ? " landing__dot--active" : ""
-                  }`}
+                  className={`landing__dot${i === current ? " landing__dot--active" : ""
+                    }`}
                   onClick={() => setCurrent(i)}
                   aria-label={`Ir a la imagen ${i + 1}`}
                   aria-current={i === current}
@@ -296,17 +322,28 @@ export function Landing() {
 
       <div className="landing__body">
         <div className="landing__container">
+          {/* ---------- Bienvenida: logo animado + texto ---------- */}
           <section className="landing__intro">
-            <p className="landing__eyebrow">Bienvenido a SIGEC</p>
+            <div className="landing__intro-brand">
+              <LoginBrand size={260} showText={false} playOnView />
+            </div>
 
-            <h2>Rentar un espacio comercial, más fácil</h2>
+            <div className="landing__intro-text">
+              <p className="landing__eyebrow">Bienvenido a SIGEC</p>
 
-            <p>
-              SIGEC es el Sistema Integral de Gestión de Espacios Comerciales.
-              Consulta los espacios disponibles, envía tus solicitudes y
-              sigue tu lugar en la lista de espera, todo desde un solo sitio.
-            </p>
+              <h2>Rentar un espacio comercial, más fácil</h2>
+
+              <p>
+                SIGEC es el Sistema Integral de Gestión de Espacios
+                Comerciales. Consulta los espacios disponibles, envía tus
+                solicitudes y sigue tu lugar en la lista de espera, todo desde
+                un solo sitio.
+              </p>
+            </div>
           </section>
+                     <div style={{ width: "min(960px, 100%)", margin: "0 auto" }}>
+              <LoginGuide />
+            </div>
 
           <section id="catalogo" className="landing__section">
             <h2>Catálogo de propiedades</h2>
@@ -405,6 +442,6 @@ export function Landing() {
           </footer>
         </div>
       </div>
-    </div>
+    </RevealAll>
   );
 }

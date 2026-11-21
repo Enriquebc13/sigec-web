@@ -1,8 +1,16 @@
+/* =========================================================
+   HomeClient
+   Orden: base · navbar · hero · anuncio · panel · accesos ·
+          catálogo · destacados · pasos · ayuda · FAQ · footer ·
+          responsive (todo junto al final)
+   ========================================================= */
+
 .client_home {
   --ch-bg: #07030f;
   --ch-glass: rgba(255, 255, 255, 0.05);
   --ch-border: rgba(255, 255, 255, 0.1);
   --ch-light: #c9b3ff;
+  --ch-promo-width: 1200px; /* ancho máximo del anuncio */
 
   position: relative;
   min-height: 100svh;
@@ -48,7 +56,6 @@
 .client_home__brand img {
   padding: 3px;
   border-radius: 10px;
-  
 }
 
 .client_home__links {
@@ -102,13 +109,13 @@
   background: rgba(133, 89, 240, 0.25);
 }
 
-/* ---------- Hero ---------- */
+/* ---------- Hero (solo bienvenida) ---------- */
 .client_home__hero {
   position: relative;
-  min-height: 82svh;
+  min-height: 60svh;
   display: grid;
   place-items: center;
-  padding: 150px 24px 200px;
+  padding: 150px 24px 72px;
   text-align: center;
   overflow: hidden;
 }
@@ -208,7 +215,7 @@
   height: 50px;
   padding: 0 30px;
   border-radius: 14px;
-  background:var(--color-primary);
+  background: var(--color-primary);
   border: 1px solid rgba(255, 255, 255, 0.35);
   box-shadow: none;
   color: #fff;
@@ -238,6 +245,25 @@
   filter: none;
 }
 
+/* ---------- Anuncio (sección independiente) ---------- */
+.client_home__promo-section {
+  position: relative;
+  z-index: 2;
+  padding: 0 24px 64px;
+  background: var(--ch-bg);
+}
+
+.client_home__promo {
+  width: min(var(--ch-promo-width), 100%);
+  margin: 0 auto;
+}
+
+/* Más ancho que alto, para que no ocupe toda la pantalla */
+.client_home__promo .promo {
+  aspect-ratio: 2 / 1;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
 /* ---------- Panel estilo dashboard ---------- */
 .client_home__body {
   position: relative;
@@ -252,8 +278,11 @@
   padding: 0 24px;
 }
 
+.client_home__container--narrow {
+  max-width: 800px;
+}
+
 .client_home__panel {
-  margin-top: -140px;
   padding: 10px;
   border-radius: 28px;
   background: rgba(255, 255, 255, 0.04);
@@ -318,7 +347,7 @@
   }
 }
 
-/* Resumen */
+/* Resumen (hoy comentado en el TSX) */
 .client_home__summary {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -382,6 +411,11 @@
   font-size: clamp(26px, 4vw, 38px);
   font-weight: 700;
   letter-spacing: -0.02em;
+}
+
+.client_home__section-title--left {
+  margin-bottom: 8px;
+  text-align: left;
 }
 
 .client_home__grid {
@@ -448,26 +482,13 @@
   transform: translateX(6px);
 }
 
-/* ---------- Footer ---------- */
-.client_home__footer {
-  margin-top: 48px;
-  text-align: center;
-  font-size: 14px;
-  color: var(--color-text-muted);
-}
 /* ---------- Catálogo de espacios ---------- */
-
 .client_home__catalog {
   position: relative;
   z-index: 1;
   width: 100%;
   padding: 70px 24px 90px;
-  background: linear-gradient(
-    180deg,
-    #07030f 0%,
-    #10091e 50%,
-    #07030f 100%
-  );
+  background: linear-gradient(180deg, #07030f 0%, #10091e 50%, #07030f 100%);
   box-sizing: border-box;
 }
 
@@ -504,21 +525,8 @@
   max-width: 100%;
   min-width: 0;
 }
-/* =========================================================
-   AGREGAR AL FINAL DE TU CSS ACTUAL
-   (usa tus mismas variables: --ch-*, --color-primary, etc.)
-   ========================================================= */
 
-/* ---------- Utilidades compartidas ---------- */
-.client_home__container--narrow {
-  max-width: 800px;
-}
-
-.client_home__section-title--left {
-  margin-bottom: 8px;
-  text-align: left;
-}
-
+/* ---------- Bloques con el mismo espaciado ---------- */
 .client_home__featured,
 .client_home__how,
 .client_home__help,
@@ -831,22 +839,63 @@
   color: var(--color-text-muted);
 }
 
-/* ---------- Responsive ---------- */
-@media (max-width: 1100px) {
-  .client_home__featured-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+/* ---------- Footer ---------- */
+.client_home__footer {
+  margin-top: 48px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--color-text-muted);
+}
 
+/* =========================================================
+   Responsive (de mayor a menor)
+   ========================================================= */
+@media (max-width: 1100px) {
+  .client_home__featured-grid,
   .client_home__steps {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .client_home__step::after {
+  .client_home__step:not(:last-child)::after {
     display: none;
   }
 }
 
+@media (max-width: 1000px) {
+  .client_home__links {
+    display: none;
+  }
+
+  .client_home__nav,
+  .client_home__nav--scrolled {
+    grid-template-columns: 1fr auto;
+  }
+}
+
 @media (max-width: 800px) {
+  .client_home__nav,
+  .client_home__nav--scrolled {
+    padding: 12px 20px;
+  }
+
+  .client_home__hero {
+    padding: 120px 20px 48px;
+  }
+
+  .client_home__btn {
+    height: 46px;
+    padding: 0 24px;
+  }
+
+  .client_home__promo-section {
+    padding: 0 14px 44px;
+  }
+
+  /* En pantallas chicas el anuncio necesita más alto para que se lea */
+  .client_home__promo .promo {
+    aspect-ratio: 4 / 3;
+  }
+
   .client_home__help-box {
     grid-template-columns: 1fr;
     padding: 24px 20px;
@@ -857,6 +906,14 @@
   .client_home__help,
   .client_home__faq {
     padding-top: 44px;
+  }
+
+  .client_home__catalog {
+    padding: 50px 18px 65px;
+  }
+
+  .client_home__catalog-header {
+    margin-bottom: 28px;
   }
 }
 
@@ -876,18 +933,6 @@
   }
 }
 
-/* ---------- Responsive ---------- */
-
-@media (max-width: 800px) {
-  .client_home__catalog {
-    padding: 50px 18px 65px;
-  }
-
-  .client_home__catalog-header {
-    margin-bottom: 28px;
-  }
-}
-
 @media (max-width: 480px) {
   .client_home__catalog {
     padding: 40px 14px 55px;
@@ -895,37 +940,5 @@
 
   .client_home__catalog-description {
     font-size: 14px;
-  }
-}
-
-/* ---------- Responsive ---------- */
-@media (max-width: 1000px) {
-  .client_home__links {
-    display: none;
-  }
-
-  .client_home__nav,
-  .client_home__nav--scrolled {
-    grid-template-columns: 1fr auto;
-  }
-}
-
-@media (max-width: 800px) {
-  .client_home__nav,
-  .client_home__nav--scrolled {
-    padding: 12px 20px;
-  }
-
-  .client_home__hero {
-    padding: 120px 20px 170px;
-  }
-
-  .client_home__panel {
-    margin-top: -110px;
-  }
-
-  .client_home__btn {
-    height: 46px;
-    padding: 0 24px;
   }
 }

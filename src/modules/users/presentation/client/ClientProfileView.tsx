@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { ProfileScreen } from "../../../../components/ProfileScreen";
 import { RoleNav } from "../../../auth/presentation/components/RoleNav";
 import { useAuth } from "../../../auth/presentation/hooks/useAuth";
+import { RentedPropertiesSection } from "../../../requests/presentation/client/components/RentedPropertiesSection";
 import { useUserProfile } from "../admin/hooks/use-user-profile";
 
 export function ClientProfileView() {
@@ -28,6 +29,7 @@ export function ClientProfileView() {
       detailsLoading={loading}
       detailsError={error}
       onSignOut={handleSignOut}
+      extra={<RentedPropertiesSection />}
     />
   );
 }

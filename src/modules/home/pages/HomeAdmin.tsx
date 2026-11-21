@@ -1,19 +1,23 @@
-
-import { useEffect, useState, useMemo } from "react";
-import { Link } from "react-router-dom";
+import { useMemo, useState, type ReactNode } from "react";
+import { Link, NavLink } from "react-router-dom";
 import {
-  Users,
   Building2,
   ClipboardList,
+  Hourglass,
+  LayoutDashboard,
+  LogOut,
+  TrendingUp,
   UserRound,
-  BriefcaseBusiness,
+  Users,
 } from "lucide-react";
 import {
-  PieChart,
-  Pie,
-  Cell,
+  Area,
+  AreaChart,
+  CartesianGrid,
   ResponsiveContainer,
   Tooltip,
+  XAxis,
+  YAxis,
 } from "recharts";
 
 import logoSigec from "../../../assets/logo-sigec.svg";
@@ -24,54 +28,6 @@ import { useProperties } from "../../properties/presentation/admin/hooks/use-pro
 import { useRequestHistory } from "../../requests/presentation/admin/hooks/use-request-history";
 import { ConfirmDialog } from "../../../components/ConfirmDialog";
 
-type Option = {
-  icon: string;
-  title: string;
-  description: string;
-  to: string;
-};
-
-const options: Option[] = [
-  {
-    icon: "👥",
-    title: "Usuarios",
-    description: "Consulta, edita y elimina las cuentas registradas.",
-    to: "/admin/users",
-  },
-  {
-    icon: "🏢",
-    title: "Espacios",
-    description: "Administra locales, oficinas y bodegas.",
-    to: "/admin/properties",
-  },
-  {
-    icon: "📨",
-    title: "Solicitudes",
-    description: "Revisa y responde las solicitudes de los interesados.",
-    to: "/admin/requests",
-  },
-  {
-    icon: "⏳",
-    title: "Listas de espera",
-    description: "Consulta quién sigue en la fila de cada espacio.",
-    to: "/admin/waitlist",
-  },
-  {
-    icon: "👤",
-    title: "Mi perfil",
-    description: "Administra tu información de cuenta.",
-    to: "/admin/profile",
-  },
-  
-];
-
-const navLinks = [
-  { label: "Usuarios", to: "/admin/users" },
-  { label: "Espacios", to: "/admin/properties" },
-  { label: "Solicitudes", to: "/admin/requests" },
-   { label: "Reportess", to: "/admin/reports" },
-];
-
 const COLORS = {
   purple: "#8559f0",
   lavender: "#c9b3ff",
@@ -80,506 +36,456 @@ const COLORS = {
   gray: "#777080",
 };
 
-const userColors: Record<string, string> = {
-  ADMIN: COLORS.teal,
-  CLIENT: COLORS.purple,
+const nav = [
+  { to: "/admin/home", label: "Inicio", icon: LayoutDashboard },
+  { to: "/admin/users", label: "Usuarios", icon: Users },
+  { to: "/admin/properties", label: "Espacios", icon: Building2 },
+  { to: "/admin/requests", label: "Solicitudes", icon: ClipboardList },
+  { to: "/admin/waitlist", label: "Listas de espera", icon: Hourglass },
+  { to: "/admin/reports", label: "Reportes", icon: TrendingUp },
+  { to: "/admin/profile", label: "Mi perfil", icon: UserRound },
+];
+
+const statusLabels: Record<string, string> = {
+  PENDING: "Pendiente",
+  APPROVED: "Aprobada",
+  REJECTED: "Rechazada",
 };
 
-const propertyColors: Record<string, string> = {
-  AVAILABLE: COLORS.teal,
-  RESERVED: COLORS.lavender,
-  RENTED: COLORS.purple,
-  UNAVAILABLE: COLORS.gray,
-};
+type PanelState = "loading" | "error" | "ok";
 
-// const userLabels: Record<string, string> = {
-//   ADMIN: "Administradores",
-//   CLIENT: "Clientes",
-// };
+const panelState = (loading: boolean, error: boolean): PanelState =>
+  loading ? "loading" : error ? "error" : "ok";
 
-// const propertyLabels: Record<string, string> = {
-//   AVAILABLE: "Disponibles",
-//   RESERVED: "Reservados",
-//   RENTED: "Rentados",
-//   UNAVAILABLE: "No disponibles",
-// };
+const show = (value: number, loading: boolean, error: boolean) =>
+  loading ? "…" : error ? "—" : String(value);
 
-function OptionCard({ icon, title, description, to }: Option) {
+function Panel({
+  title,
+  subtitle,
+  state,
+  children,
+}: {
+  title: string;
+  subtitle: string;
+  state: PanelState;
+  children: ReactNode;
+}) {
   return (
-    <Link to={to} className="home__card">
-      <span className="home__card-icon" aria-hidden="true">
-        {icon}
-      </span>
-      <span className="home__card-title">{title}</span>
-      <span className="home__card-description">{description}</span>
-      <span className="home__card-cta">Administrar →</span>
-    </Link>
+    <section className="dash__panel">
+      <header className="dash__panel-head">
+        <h2>{title}</h2>
+        <p>{subtitle}</p>
+      </header>
+
+      {state === "loading" ? (
+        <p className="dash__msg">Cargando información…</p>
+      ) : state === "error" ? (
+        <p className="dash__msg">No se pudo cargar la información.</p>
+      ) : (
+        children
+      )}
+    </section>
   );
 }
 
-type DashboardChartProps = {
-  title: string;
-  subtitle: string;
-  icon: React.ReactNode;
-  total: number;
-  data: { name: string; value: number; color: string }[];
-  loading?: boolean;
-  error?: boolean;
-  emptyMessage?: string;
-};
-
-function DashboardChart({
-  title,
-  subtitle,
-  icon,
-  total,
-  data,
-  loading = false,
-  error = false,
-  emptyMessage = "No hay registros todavía",
-}: DashboardChartProps) {
-  const hasData = data.some((item) => item.value > 0);
+function Bars({
+  rows,
+}: {
+  rows: { name: string; value: number; color: string }[];
+}) {
+  const total = rows.reduce((sum, row) => sum + row.value, 0);
 
   return (
-    <article className="home__chart-card">
-      <div className="home__chart-header">
-        <div className="home__chart-heading">
-          <span className="home__chart-icon">{icon}</span>
-          <div>
-            <h3>{title}</h3>
-            <p>{subtitle}</p>
-          </div>
-        </div>
+    <ul className="dash__bars">
+      {rows.map((row) => {
+        const pct = total ? Math.round((row.value / total) * 100) : 0;
+
+        return (
+          <li key={row.name}>
+            <div className="dash__bar-top">
+              <span>{row.name}</span>
+              <strong>
+                {row.value} <small>({pct}%)</small>
+              </strong>
+            </div>
+            <div className="dash__track">
+              <span style={{ width: `${pct}%`, background: row.color }} />
+            </div>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
+function Ring({ percent }: { percent: number }) {
+  const radius = 52;
+  const circumference = 2 * Math.PI * radius;
+
+  return (
+    <div className="dash__ring">
+      <svg viewBox="0 0 120 120" role="img" aria-label={`${percent}% ocupado`}>
+        <circle className="dash__ring-bg" cx="60" cy="60" r={radius} />
+        <circle
+          className="dash__ring-fg"
+          cx="60"
+          cy="60"
+          r={radius}
+          strokeDasharray={`${(percent / 100) * circumference} ${circumference}`}
+          transform="rotate(-90 60 60)"
+        />
+      </svg>
+      <div>
+        <strong>{percent}%</strong>
+        <span>ocupado</span>
       </div>
-
-      {loading ? (
-        <div className="home__chart-message">
-          <span className="home__chart-spinner" />
-          Cargando información...
-        </div>
-      ) : error ? (
-        <div className="home__chart-message">
-          No se pudo cargar la información.
-        </div>
-      ) : (
-        <>
-          <div className="home__chart-content">
-            <div className="home__donut">
-              {hasData ? (
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={data}
-                      dataKey="value"
-                      nameKey="name"
-                      cx="50%"
-                      cy="50%"
-                      innerRadius="68%"
-                      outerRadius="92%"
-                      paddingAngle={3}
-                      stroke="none"
-                    >
-                      {data.map((entry) => (
-                        <Cell key={entry.name} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip
-                      formatter={(value, name) => [
-                        value,
-                        name,
-                      ]}
-                      contentStyle={{
-                        background: "#171020",
-                        border: "1px solid rgba(201,179,255,.2)",
-                        borderRadius: "10px",
-                        color: "#fff",
-                      }}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
-              ) : (
-                <div className="home__donut-empty">
-                  <span>0</span>
-                  <small>Registros</small>
-                </div>
-              )}
-
-              {hasData && (
-                <div className="home__donut-center">
-                  <strong>{total}</strong>
-                  <span>Total</span>
-                </div>
-              )}
-            </div>
-
-            <div className="home__chart-legend">
-              {data.map((item) => (
-                <div className="home__legend-item" key={item.name}>
-                  <span
-                    className="home__legend-dot"
-                    style={{ backgroundColor: item.color }}
-                  />
-                  <span className="home__legend-name">{item.name}</span>
-                  <strong>{item.value}</strong>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {!hasData && (
-            <p className="home__chart-empty">{emptyMessage}</p>
-          )}
-        </>
-      )}
-    </article>
+    </div>
   );
 }
 
 export function HomeAdmin() {
   const { user, logout } = useAuth();
+  const [confirmingLogout, setConfirmingLogout] = useState(false);
 
-  const {
-    users,
-    loading: usersLoading,
-    error: usersError,
-  } = useUsers();
-
+  const { users, loading: usersLoading, error: usersError } = useUsers();
   const {
     properties,
     loading: propertyLoading,
     error: propertiesError,
   } = useProperties();
-
   const {
     history,
     loading: requestsLoading,
     error: requestsError,
   } = useRequestHistory();
 
-
-  const [scrolled, setScrolled] = useState(false);
-  const [confirmingLogout, setConfirmingLogout] = useState(false);
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40);
-
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  // Distribución de usuarios por rol
-  const usersData = [
-    {
-      name: "Administradores",
-      value: users.filter((u) => u.role === "ADMIN").length,
-      color: userColors.ADMIN,
-    },
-    {
-      name: "Clientes",
-      value: users.filter((u) => u.role === "CLIENT").length,
-      color: userColors.CLIENT,
-    },
-  ];
-
-  // Distribución de espacios por estado
-  const propertiesData = [
-    {
-      name: "Disponibles",
-      value: properties.filter((p) => p.status === "AVAILABLE").length,
-      color: propertyColors.AVAILABLE,
-    },
-    {
-      name: "Reservados",
-      value: properties.filter((p) => p.status === "RESERVED").length,
-      color: propertyColors.RESERVED,
-    },
-    {
-      name: "Rentados",
-      value: properties.filter((p) => p.status === "RENTED").length,
-      color: propertyColors.RENTED,
-    },
-    {
-      name: "No disponibles",
-      value: properties.filter((p) => p.status === "UNAVAILABLE").length,
-      color: propertyColors.UNAVAILABLE,
-    },
-  ];
-
-  // Obtener la última versión del historial de cada solicitud
-  const requestsByStatus = useMemo(() => {
-    const latestRequests = new Map<
-      string,
-      (typeof history)[number]
-    >();
+  // Última versión de cada solicitud + conteo por estado + lista reciente
+  const { requestsByStatus, recent, totalRequests, pending } = useMemo(() => {
+    const latest = new Map<string, (typeof history)[number]>();
 
     history.forEach((event) => {
-      const current = latestRequests.get(event.requestId);
+      const current = latest.get(event.requestId);
 
       if (
         !current ||
         new Date(event.changedAt).getTime() >
-        new Date(current.changedAt).getTime()
+          new Date(current.changedAt).getTime()
       ) {
-        latestRequests.set(event.requestId, event);
+        latest.set(event.requestId, event);
       }
     });
 
-    const requests = Array.from(latestRequests.values());
+    const list = Array.from(latest.values()).sort(
+      (a, b) =>
+        new Date(b.changedAt).getTime() - new Date(a.changedAt).getTime(),
+    );
+    const count = (status: string) =>
+      list.filter((item) => item.request.status === status).length;
 
-    return [
-      {
-        name: "Pendientes",
-        value: requests.filter(
-          (item) => item.request.status === "PENDING",
-        ).length,
-        color: COLORS.purple,
-      },
-      {
-        name: "Aprobadas",
-        value: requests.filter(
-          (item) => item.request.status === "APPROVED",
-        ).length,
-        color: COLORS.teal,
-      },
-      {
-        name: "Rechazadas",
-        value: requests.filter(
-          (item) => item.request.status === "REJECTED",
-        ).length,
-        color: COLORS.lavender,
-      },
-    ];
+    return {
+      requestsByStatus: [
+        { name: "Pendientes", value: count("PENDING"), color: COLORS.purple },
+        { name: "Aprobadas", value: count("APPROVED"), color: COLORS.teal },
+        { name: "Rechazadas", value: count("REJECTED"), color: COLORS.gray },
+      ],
+      recent: list.slice(0, 5),
+      totalRequests: list.length,
+      pending: count("PENDING"),
+    };
   }, [history]);
 
-  const totalRequests = requestsByStatus.reduce(
-    (total, item) => total + item.value,
-    0,
-  );
+  // Movimientos del historial por mes (últimos 6 meses)
+  const activity = useMemo(() => {
+    const monthName = new Intl.DateTimeFormat("es-MX", { month: "short" });
+    const now = new Date();
 
-  // const pendingRequests =
-  //   requestsByStatus.find((item) => item.name === "Pendientes")?.value ?? 0;
+    const months = Array.from({ length: 6 }, (_, i) => {
+      const d = new Date(now.getFullYear(), now.getMonth() - (5 - i), 1);
+      return {
+        key: `${d.getFullYear()}-${d.getMonth()}`,
+        name: monthName.format(d).replace(".", ""),
+        total: 0,
+      };
+    });
 
-  const summary = [
+    history.forEach((event) => {
+      const d = new Date(event.changedAt);
+      const month = months.find(
+        (m) => m.key === `${d.getFullYear()}-${d.getMonth()}`,
+      );
+      if (month) month.total += 1;
+    });
+
+    return months;
+  }, [history]);
+
+  const propertiesData = [
     {
-      icon: <Users size={20} />,
-      label: "Usuarios registrados",
-      value: usersLoading
-        ? "..."
-        : usersError
-          ? "—"
-          : String(users.length),
+      name: "Disponibles",
+      value: properties.filter((p) => p.status === "AVAILABLE").length,
+      color: COLORS.teal,
     },
     {
-      icon: <Building2 size={20} />,
-      label: "Espacios registrados",
-      value: propertyLoading
-        ? "..."
-        : propertiesError
-          ? "—"
-          : String(properties.length),
+      name: "Reservados",
+      value: properties.filter((p) => p.status === "RESERVED").length,
+      color: COLORS.lavender,
     },
     {
-  icon: <ClipboardList size={20} />,
-  label: "Total de solicitudes",
-  value: requestsLoading
-    ? "..."
-    : requestsError
-      ? "—"
-      : String(totalRequests),
-},
-    // {
-    //   icon: <ClipboardList size={20} />,
-    //   label: "Solicitudes pendientes",
-    //   value: requestsLoading
-    //     ? "..."
-    //     : requestsError
-    //       ? "—"
-    //       : String(pendingRequests),
-    // },
+      name: "Rentados",
+      value: properties.filter((p) => p.status === "RENTED").length,
+      color: COLORS.purple,
+    },
+    {
+      name: "No disponibles",
+      value: properties.filter((p) => p.status === "UNAVAILABLE").length,
+      color: COLORS.gray,
+    },
   ];
 
+  const occupied = propertiesData[1].value + propertiesData[2].value;
+  const occupancy = properties.length
+    ? Math.round((occupied / properties.length) * 100)
+    : 0;
+
+  const stats = [
+    {
+      tone: "teal",
+      icon: <Users size={22} />,
+      value: show(users.length, usersLoading, !!usersError),
+      label: "Usuarios registrados",
+      cta: "Ver usuarios",
+      to: "/admin/users",
+    },
+    {
+      tone: "blue",
+      icon: <Building2 size={22} />,
+      value: show(properties.length, propertyLoading, !!propertiesError),
+      label: "Espacios registrados",
+      cta: "Ver espacios",
+      to: "/admin/properties",
+    },
+    {
+      tone: "purple",
+      icon: <ClipboardList size={22} />,
+      value: show(pending, requestsLoading, !!requestsError),
+      label: "Solicitudes pendientes",
+      cta: "Revisar solicitudes",
+      to: "/admin/requests",
+    },
+  ];
+
+  const today = new Date().toLocaleDateString("es-MX", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+  });
+
+  const requestsState = panelState(requestsLoading, !!requestsError);
+  const propertiesState = panelState(propertyLoading, !!propertiesError);
+
   return (
-    <main className="home">
-      {/* Navbar */}
-      <header className={`home__nav${scrolled ? " home__nav--scrolled" : ""}`}>
-        <Link to="/admin/home" className="home__brand">
-          <img src={logoSigec} alt="" width="40" height="40" />
+    <div className="dash">
+      {/* Barra lateral */}
+      <aside className="dash__side">
+        <Link to="/admin/home" className="dash__brand">
+          <img src={logoSigec} alt="" />
           <span>SIGEC</span>
         </Link>
 
-        <nav className="home__links" aria-label="Navegación principal">
-          <Link to="/admin/home" className="home__link--active">
-            Inicio
-          </Link>
+        {user && (
+          <div className="dash__me">
+            <span className="dash__avatar" aria-hidden="true">
+              {user.email.charAt(0).toUpperCase()}
+            </span>
+            <div>
+              <span className="dash__me-mail">{user.email}</span>
+              <span className="dash__role">
+                {user.role === "ADMIN" ? "Administrador" : user.role}
+              </span>
+            </div>
+          </div>
+        )}
 
-          {navLinks.map((link) => (
-            <Link key={link.to} to={link.to}>
-              {link.label}
-            </Link>
+        <nav className="dash__nav" aria-label="Navegación del administrador">
+          {nav.map(({ to, label, icon: Icon }) => (
+            <NavLink
+              key={to}
+              to={to}
+              end
+              className={({ isActive }) =>
+                `dash__link${isActive ? " dash__link--active" : ""}`
+              }
+            >
+              <Icon size={19} aria-hidden="true" />
+              {label}
+            </NavLink>
           ))}
         </nav>
 
         <button
           type="button"
-          className="home__logout"
+          className="dash__logout"
           onClick={() => setConfirmingLogout(true)}
         >
+          <LogOut size={19} aria-hidden="true" />
           Cerrar sesión
         </button>
-      </header>
+      </aside>
 
-      {/* Hero */}
-      <section className="home__hero">
-        <div className="home__rays" aria-hidden="true" />
+      {/* Contenido */}
+      <main className="dash__main">
+        <header className="dash__head">
+          <h1>Panel de administración</h1>
+          <p>Hoy es {today}. Esto es lo que pasa en SIGEC.</p>
+        </header>
 
-        <div className="home__building" aria-hidden="true">
-          <img src={logoSigec} alt="" />
-        </div>
-
-        <div className="home__glow" />
-
-        <div className="home__hero-content">
-          <p className="home__badge">
-            <span className="home__badge-icon" aria-hidden="true">✦</span>
-            Panel de administración
-          </p>
-
-          <h1 className="home__title">
-            Administra SIGEC
-            <br />
-            <span className="home__title-accent">
-              desde un solo lugar
-            </span>
-          </h1>
-
-          <p className="home__lead">
-            Gestiona usuarios, espacios, solicitudes y listas de espera de
-            manera sencilla desde tu panel administrativo.
-          </p>
-
-          {user && (
-            <div className="admin__session">
-              <span className="admin__session-email">{user.email}</span>
-              <span className="admin__badge">{user.role}</span>
-            </div>
-          )}
-
-          <div className="home__actions">
-            <Link to="/admin/users" className="home__btn">
-              Gestionar usuarios
-            </Link>
-
+        <section className="dash__stats" aria-label="Resumen">
+          {stats.map((item) => (
             <Link
-              to="/admin/properties"
-              className="home__btn home__btn--ghost"
+              key={item.label}
+              to={item.to}
+              className={`dash__stat dash__stat--${item.tone}`}
             >
-              Ver espacios
+              <span className="dash__stat-icon">{item.icon}</span>
+              <span className="dash__stat-value">{item.value}</span>
+              <span className="dash__stat-label">{item.label}</span>
+              <span className="dash__stat-cta">{item.cta}</span>
             </Link>
-          </div>
-        </div>
-      </section>
+          ))}
+        </section>
 
-      {/* Panel administrativo */}
-      <div className="home__body">
-        <div className="home__container">
-          <div className="home__panel">
-            <div className="home__panel-bar">
-              <span className="home__dots" aria-hidden="true">
-                <i />
-                <i />
-                <i />
-              </span>
-
-              <span className="home__panel-title">
-                Resumen de administración
-              </span>
-
-              <span className="home__panel-status">
-                <span className="home__pulse" />
-                En línea
-              </span>
-            </div>
-
-            {/* Contadores */}
-            <section className="home__summary" aria-label="Resumen administrativo">
-              {summary.map((item) => (
-                <article key={item.label} className="home__stat">
-                  <span className="home__stat-icon">{item.icon}</span>
-                  <span className="home__stat-value">{item.value}</span>
-                  <span className="home__stat-label">{item.label}</span>
-                </article>
-              ))}
-            </section>
-
-            {/* Gráficas */}
-            <section className="home__charts-section">
-              <div className="home__charts-title">
-                <p className="home__section-eyebrow">
-                  Estadísticas generales
-                </p>
-                <h2 className="home__section-title">
-                  Resumen visual de SIGEC
-                </h2>
-                <p className="home__charts-description">
-                  Consulta la distribución de usuarios y espacios registrados.
-                </p>
-              </div>
-
-              <div className="home__charts-grid">
-                <DashboardChart
-                  title="Usuarios"
-                  subtitle="Distribución por rol"
-                  icon={<UserRound size={20} />}
-                  total={users.length}
-                  data={usersData}
-                  loading={usersLoading}
-                  error={!!usersError}
-                />
-
-                <DashboardChart
-                  title="Espacios"
-                  subtitle="Distribución por estado"
-                  icon={<BriefcaseBusiness size={20} />}
-                  total={properties.length}
-                  data={propertiesData}
-                  loading={propertyLoading}
-                  error={!!propertiesError}
-                />
-                <DashboardChart
-                  title="Solicitudes"
-                  subtitle="Distribución por estado"
-                  icon={<ClipboardList size={20} />}
-                  total={totalRequests}
-                  data={requestsByStatus}
-                  loading={requestsLoading}
-                  error={!!requestsError}
-                  emptyMessage="Todavía no hay solicitudes registradas."
-                />
-              </div>
-            </section>
-
-            {/* Accesos rápidos */}
-            <section className="home__section">
-              <p className="home__section-eyebrow">Accesos rápidos</p>
-              <h2 className="home__section-title">
-                ¿Qué deseas administrar?
-              </h2>
-
-              <div className="home__grid">
-                {options.map((option) => (
-                  <OptionCard key={option.title} {...option} />
+        <div className="dash__row dash__row--2">
+          <Panel
+            title="Solicitudes recientes"
+            subtitle="Las últimas que cambiaron de estado"
+            state={requestsState}
+          >
+            {recent.length === 0 ? (
+              <p className="dash__msg">
+                Todavía no hay solicitudes. Cuando un cliente se interese en un
+                espacio, aparecerá aquí.
+              </p>
+            ) : (
+              <ul className="dash__recent">
+                {recent.map((event) => (
+                  <li key={event.id}>
+                    <div className="dash__recent-who">
+                      <span>
+                        {event.request.user.name} {event.request.user.lastname}
+                      </span>
+                      <small>
+                        {new Date(event.changedAt).toLocaleDateString("es-MX", {
+                          day: "numeric",
+                          month: "short",
+                        })}
+                      </small>
+                    </div>
+                    <span
+                      className={`dash__chip dash__chip--${event.request.status.toLowerCase()}`}
+                    >
+                      {statusLabels[event.request.status]}
+                    </span>
+                  </li>
                 ))}
-              </div>
-            </section>
-          </div>
+              </ul>
+            )}
+          </Panel>
 
-          <footer className="home__footer">
-            Sistema Integral de Gestión de Espacios Comerciales
-          </footer>
+          <Panel
+            title="Movimiento de solicitudes"
+            subtitle="Cambios registrados en los últimos 6 meses"
+            state={requestsState}
+          >
+            <div className="dash__chart">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart
+                  data={activity}
+                  margin={{ top: 8, right: 8, left: 0, bottom: 0 }}
+                >
+                  <defs>
+                    <linearGradient id="dashArea" x1="0" y1="0" x2="0" y2="1">
+                      <stop
+                        offset="0%"
+                        stopColor={COLORS.purple}
+                        stopOpacity={0.55}
+                      />
+                      <stop
+                        offset="100%"
+                        stopColor={COLORS.purple}
+                        stopOpacity={0}
+                      />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid
+                    stroke="rgba(255,255,255,.07)"
+                    vertical={false}
+                  />
+                  <XAxis
+                    dataKey="name"
+                    tickLine={false}
+                    axisLine={false}
+                    tick={{ fill: "#9b93ad", fontSize: 12 }}
+                  />
+                  <YAxis
+                    allowDecimals={false}
+                    width={32}
+                    tickLine={false}
+                    axisLine={false}
+                    tick={{ fill: "#9b93ad", fontSize: 12 }}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      background: "#171020",
+                      border: "1px solid rgba(201,179,255,.2)",
+                      borderRadius: "10px",
+                      color: "#fff",
+                    }}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="total"
+                    name="Movimientos"
+                    stroke={COLORS.lavender}
+                    strokeWidth={2.5}
+                    fill="url(#dashArea)"
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </Panel>
         </div>
-      </div>
+
+        <div className="dash__row dash__row--3">
+          <Panel
+            title="Espacios por estado"
+            subtitle={`${properties.length} espacios en total`}
+            state={propertiesState}
+          >
+            <Bars rows={propertiesData} />
+          </Panel>
+
+          <Panel
+            title="Solicitudes por estado"
+            subtitle={`${totalRequests} solicitudes en total`}
+            state={requestsState}
+          >
+            <Bars rows={requestsByStatus} />
+          </Panel>
+
+          <Panel
+            title="Ocupación"
+            subtitle="Espacios rentados o reservados"
+            state={propertiesState}
+          >
+            <Ring percent={occupancy} />
+            <p className="dash__ring-note">
+              {occupied} de {properties.length} espacios
+            </p>
+          </Panel>
+        </div>
+      </main>
+
       {confirmingLogout && (
         <ConfirmDialog
           title="Cerrar sesión"
@@ -593,6 +499,6 @@ export function HomeAdmin() {
           onCancel={() => setConfirmingLogout(false)}
         />
       )}
-    </main>
+    </div>
   );
 }

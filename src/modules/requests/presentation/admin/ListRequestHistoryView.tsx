@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import { GlowScreen } from "../../../../components/GlowScreen";
 import { useProperties } from "../../../properties/presentation/admin/hooks/use-properties";
 import type { DecisionStatus } from "../../domain/entities/request.entity";
@@ -8,7 +9,7 @@ import type {
 } from "../../domain/entities/request-history.entity";
 import { EditRequestStatusModal } from "./components/EditRequestStatusModal";
 import { useRequestHistory } from "./hooks/use-request-history";
-import { REQUEST_STATUS_LABELS, actionLabel } from "./request-labels";
+import { REQUEST_STATUS_LABELS, actionLabel, displayStatusLabel } from "./request-labels";
 import {
   buildContactMessage,
   buildWhatsAppUrl,
@@ -37,12 +38,21 @@ export function ListRequestHistoryView() {
   const { history, loading, error, reload } = useRequestHistory();
   const { properties, loading: propertiesLoading } = useProperties();
   const [query, setQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<
+    "ALL" | "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED"
+  >("ALL");
   const [editing, setEditing] = useState<RequestHistory | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
 
   // id de propiedad → título
   const propertyTitles = useMemo(
     () => new Map(properties.map((p) => [p.id, p.title])),
+    [properties],
+  );
+
+  // id de propiedad → estado (para marcar las solicitudes aprobadas ya rentadas)
+  const propertyStatuses = useMemo(
+    () => new Map(properties.map((p) => [p.id, p.status])),
     [properties],
   );
 
@@ -76,15 +86,46 @@ export function ListRequestHistoryView() {
     return new Set([...latest.values()].map((h) => h.id));
   }, [history]);
 
-  // Filtra por el nombre del solicitante (nombre, apellido o correo)
+  // Solicitudes que canceló su propio dueño: su último rechazo lo registró él
+  const cancelledRequestIds = useMemo(() => {
+    const lastRejection = new Map<string, RequestHistory>();
+    for (const h of history) {
+      if (h.action !== "REJECTED") continue;
+      const current = lastRejection.get(h.requestId);
+      if (!current || h.changedAt > current.changedAt) {
+        lastRejection.set(h.requestId, h);
+      }
+    }
+    return new Set(
+      [...lastRejection.values()]
+        .filter(
+          (h) => h.request.status === "REJECTED" && h.userId === h.request.userId,
+        )
+        .map((h) => h.requestId),
+    );
+  }, [history]);
+
+  // Filtra por estado y por el solicitante (nombre, apellido o correo)
   const filtered = useMemo(() => {
     const q = normalize(query.trim());
-    if (!q) return history;
     return history.filter((h) => {
+      const cancelled = cancelledRequestIds.has(h.requestId);
+      const status = h.request.status;
+
+      if (statusFilter === "CANCELLED" && !cancelled) return false;
+      if (statusFilter === "REJECTED" && (status !== "REJECTED" || cancelled))
+        return false;
+      if (
+        (statusFilter === "PENDING" || statusFilter === "APPROVED") &&
+        status !== statusFilter
+      )
+        return false;
+
+      if (!q) return true;
       const { name, lastname, email } = h.request.user;
       return normalize(`${name} ${lastname} ${email}`).includes(q);
     });
-  }, [history, query]);
+  }, [history, query, statusFilter, cancelledRequestIds]);
 
   const handleSaved = (status: DecisionStatus) => {
     setEditing(null);
@@ -122,7 +163,27 @@ export function ListRequestHistoryView() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
-
+        <div className="rhist__filters" role="group" aria-label="Filtrar por estado">
+          {(
+            [
+              ["ALL", "Todas"],
+              ["PENDING", "Pendientes"],
+              ["APPROVED", "Aprobadas"],
+              ["REJECTED", "Rechazadas"],
+              ["CANCELLED", "Canceladas"],
+            ] as const
+          ).map(([value, label]) => (
+            <button
+              key={value}
+              type="button"
+              className={`rhist__chip${statusFilter === value ? " rhist__chip--active" : ""}`}
+              onClick={() => setStatusFilter(value)}
+              aria-pressed={statusFilter === value}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
         {notice && (
           <p className="rhist__notice" role="status">
             {notice}
@@ -150,7 +211,7 @@ export function ListRequestHistoryView() {
               <p className="rhist__state">
                 {history.length === 0
                   ? "Todavía no hay solicitudes registradas."
-                  : "Ningún registro coincide con la búsqueda."}
+                  : "Ningún registro coincide con los filtros."}
               </p>
             ) : (
               <div className="rhist__table-wrapper">
@@ -201,18 +262,39 @@ export function ListRequestHistoryView() {
                           {propertyLabel(h.request.propertyId)}
                         </td>
                         <td>
-                          <span
-                            className={`rhist__status rhist__status--${h.request.status.toLowerCase()}`}
-                          >
-                            {REQUEST_STATUS_LABELS[h.request.status]}
-                          </span>
+                          <div className="rhist__status-group">
+                            <span className={`rhist__status rhist__status--${h.request.status.toLowerCase()}`}>
+                              {displayStatusLabel(h.request.status, cancelledRequestIds.has(h.requestId))}
+                            </span>
+                            {h.request.status === "APPROVED" &&
+                              propertyStatuses.get(h.request.propertyId) === "RENTED" && (
+                                <span className="rhist__status rhist__status--rented">
+                                 Rentada
+                                </span>
+                              )}
+                          </div>
                         </td>
-                        <td>{actionLabel(h.action)}</td>
+                        <td>
+                          {h.action === "REJECTED" && h.userId === h.request.userId
+                            ? "Solicitud cancelada por el solicitante"
+                            : actionLabel(h.action)}
+                        </td>
                         <td>
                           {h.user.name} {h.user.lastname}
                         </td>
                         <td>
-                          {latestEventIds.has(h.id) ? (
+                          {h.request.status === "APPROVED" &&
+                            propertyStatuses.get(h.request.propertyId) ===
+                            "RENTED" ? (
+                            <Link
+                              to="/admin/properties"
+                              className="rhist__action"
+                              title="Está rentada: para terminar el contrato, pon la propiedad en Disponible"
+                            >
+                              Ir a Propiedades
+                            </Link>
+                          ) : latestEventIds.has(h.id) &&
+                            h.request.status !== "REJECTED" ? (
                             <button
                               type="button"
                               className="rhist__action"
@@ -223,7 +305,11 @@ export function ListRequestHistoryView() {
                           ) : (
                             <span
                               className="rhist__muted"
-                              title="Se edita desde el evento más reciente de la solicitud"
+                              title={
+                                h.request.status === "REJECTED"
+                                  ? "Una solicitud rechazada no se puede reabrir"
+                                  : "Se edita desde el evento más reciente de la solicitud"
+                              }
                             >
                               —
                             </span>

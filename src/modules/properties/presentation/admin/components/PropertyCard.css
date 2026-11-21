@@ -423,3 +423,27 @@
     animation: none;
   }
 }
+/* Enlace con aspecto de botón (por ejemplo, "Lista de espera") */
+.pcard__btn--link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+  background: transparent;
+  text-decoration: none;
+}
+
+.pcard__btn--link:hover {
+  background: rgba(133, 89, 240, 0.3);
+}
+
+.pcard__renter {
+  margin: 0 0 8px;
+  padding: 5px 12px;
+  border-radius: var(--radius-pill);
+  border: 1px solid rgba(74, 155, 148, 0.8);
+  background: rgba(74, 155, 148, 0.25);
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+}

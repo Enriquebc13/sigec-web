@@ -1,10 +1,12 @@
 import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
 import type { UpdatePropertyDto } from "../../../application/dtos/update-property.dto";
 import type {
+  AutoRejectedRequest,
   Property,
   PropertyStatus,
   PropertyType,
 } from "../../../domain/entities/property.entity";
+import { ConfirmDialog } from "../../../../../components/ConfirmDialog";
 import { useUpdateProperty } from "../hooks/use-update-property";
 import {
   PROPERTY_STATUS_LABELS,
@@ -15,8 +17,8 @@ import "./PropertyFormModal.css"; // estilos base del formulario (overlay, campo
 type Props = {
   property: Property;
   onClose: () => void;
-  /** Se llama cuando los cambios quedaron guardados */
-  onSaved: () => void;
+  /** Se llama cuando los cambios quedaron guardados, con las solicitudes que la API rechazó sola */
+  onSaved: (autoRejected: AutoRejectedRequest[]) => void;
 };
 
 type FormState = {
@@ -110,6 +112,8 @@ export function EditPropertyModal({ property, onClose, onSaved }: Props) {
   const { update, loading, error } = useUpdateProperty();
   const [form, setForm] = useState<FormState>(() => toForm(property));
   const [noChanges, setNoChanges] = useState(false);
+  // Confirmación antes de volver a publicar una propiedad rentada o reservada
+  const [confirming, setConfirming] = useState(false);
 
   // Cerrar con Escape (no mientras se guarda)
   useEffect(() => {
@@ -129,6 +133,10 @@ export function EditPropertyModal({ property, onClose, onSaved }: Props) {
     ) =>
       setForm((prev) => ({ ...prev, [field]: e.target.value }));
 
+  const needsConfirmation =
+    form.status === "AVAILABLE" &&
+    (property.status === "RENTED" || property.status === "RESERVED");
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setNoChanges(false);
@@ -139,13 +147,38 @@ export function EditPropertyModal({ property, onClose, onSaved }: Props) {
       return;
     }
 
-    const ok = await update(property.id, changes);
-    if (ok) onSaved();
+    // Volver a publicar una propiedad rentada/reservada cancela su contrato o trato
+    if (needsConfirmation) {
+      setConfirming(true);
+      return;
+    }
+
+    await save(changes);
   };
+
+  const save = async (changes: UpdatePropertyDto) => {
+    const autoRejected = await update(property.id, changes);
+    if (autoRejected) onSaved(autoRejected);
+  };
+
+  const confirmAndSave = () => save(buildChanges(property, form));
 
   const message = noChanges ? "No hiciste ningún cambio" : error;
 
+  // Avisa qué pasará con las solicitudes antes de guardar el cambio de estado
+  const statusWarning =
+    form.status === property.status
+      ? null
+      : form.status === "RENTED"
+        ? "Al guardar, las solicitudes pendientes de esta propiedad se rechazarán automáticamente."
+        : property.status === "RENTED" && form.status === "AVAILABLE"
+          ? "Al guardar, se da por cancelado el contrato: la solicitud aprobada se rechazará y la propiedad volverá al catálogo."
+          : property.status === "RESERVED" && form.status === "AVAILABLE"
+            ? "Al guardar, la solicitud aprobada de esta propiedad se rechazará y la fila de espera continuará."
+            : null;
+
   return (
+    <>
     <div
       className="pform__overlay"
       onMouseDown={(e) => {
@@ -210,6 +243,11 @@ export function EditPropertyModal({ property, onClose, onSaved }: Props) {
                     </option>
                   ))}
                 </select>
+                {statusWarning && (
+                  <p className="pform__status-warning" role="note">
+                    ⚠️ {statusWarning}
+                  </p>
+                )}
               </div>
 
               <div className="pform__field">
@@ -350,5 +388,30 @@ export function EditPropertyModal({ property, onClose, onSaved }: Props) {
         </form>
       </div>
     </div>
+
+    {confirming && (
+      <ConfirmDialog
+        title={
+          property.status === "RENTED"
+            ? "Volver a publicar propiedad rentada"
+            : "Liberar reserva"
+        }
+        message={
+          property.status === "RENTED"
+            ? `«${property.title}» está rentada. Si la pasas a «Disponible» se dará por cancelado el contrato: la solicitud aprobada se rechazará y la propiedad volverá a aparecer en el catálogo. Hazlo solo si ya hablaste con el cliente y confirmó que deja el local. ¿Seguro que quieres volver a publicarla?`
+            : `«${property.title}» está reservada por un trato en curso. Si la pasas a «Disponible», la solicitud aprobada se rechazará y el siguiente de la lista de espera pasará a ser el primero. ¿Seguro que quieres continuar?`
+        }
+        confirmLabel={
+          property.status === "RENTED" ? "Sí, volver a publicar" : "Sí, liberar"
+        }
+        cancelLabel="Volver"
+        danger
+        loading={loading}
+        error={error}
+        onConfirm={confirmAndSave}
+        onCancel={() => setConfirming(false)}
+      />
+    )}
+    </>
   );
 }

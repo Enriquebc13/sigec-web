@@ -241,3 +241,10 @@
     grid-template-columns: 1fr;
   }
 }
+/* Aviso al cambiar el estado de la propiedad (afecta solicitudes) */
+.pform__status-warning {
+  margin: 6px 0 0;
+  font-size: 13px;
+  line-height: 1.4;
+  color: #fcd34d;
+}

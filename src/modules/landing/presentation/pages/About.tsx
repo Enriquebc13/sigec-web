@@ -30,12 +30,12 @@ const purpose: InfoItem[] = [
   {
     icon: Target,
     title: "Misión",
-    text: "Facilitar la administración de espacios comerciales mediante una plataforma web que centralice la gestión de locales, oficinas y bodegas, agilice la atención de solicitudes y automatice las listas de espera, ofreciendo un servicio seguro, organizado y transparente para administradores y clientes.",
+    text: "Facilitar la gestión de espacios comerciales mediante una plataforma web que centralice la información de locales, oficinas y bodegas, simplifique el seguimiento de solicitudes y organice las listas de espera, ofreciendo un servicio eficiente, seguro y accesible.",
   },
   {
     icon: Telescope,
     title: "Visión",
-    text: "Ser una plataforma de referencia en la gestión de espacios comerciales, reconocida por simplificar los procesos administrativos, mejorar la atención a los interesados y brindar una experiencia confiable, eficiente y accesible para administradores y clientes.",
+    text: "Ser una plataforma de referencia en la gestión de espacios comerciales, reconocida por optimizar los procesos de administración, mejorar la atención a los interesados y ofrecer una experiencia confiable, organizada y transparente.",
   },
 ];
 
@@ -48,7 +48,7 @@ const highlights: InfoItem[] = [
   {
     icon: ClipboardList,
     title: "Solicitudes y listas de espera",
-    text: "Los interesados envían su solicitud y, cuando un espacio se libera, el sistema ya sabe quién sigue en la fila.",
+    text: "Muestra interés en los espacios disponibles y proporciona tus datos de contacto. Si varias personas están interesadas en una misma propiedad, SIGEC organiza las solicitudes por orden de atención y te permite consultar tu posición en la fila.",
   },
   {
     icon: ShieldCheck,
@@ -86,25 +86,25 @@ const initials = (name: string) =>
 export function About({ backTo = "/" }: Props) {
   return (
     <GlowScreen wide>
-    <header className="about__bar">
-  <Link to={backTo} className="about__brand">
-    <img src={logoSigec} alt="Logo SIGEC" width="36" height="36" />
-    <span>SIGEC</span>
-  </Link>
+      <header className="about__bar">
+        <Link to={backTo} className="about__brand">
+          <img src={logoSigec} alt="Logo SIGEC" width="36" height="36" />
+          <span>SIGEC</span>
+        </Link>
 
-  <nav className="landing__links">
-    <Link to="/#catalogo">Catálogo</Link>
-    <Link to="/#caracteristicas">Características</Link>
-    <Link to="/#como-funciona">Cómo funciona</Link>
-    <Link to="/about" className="landing__link--active">
-      Acerca de
-    </Link>
-  </nav>
+        <nav className="landing__links">
+          <Link to="/#catalogo">Catálogo</Link>
+          <Link to="/#caracteristicas">Características</Link>
+          <Link to="/#como-funciona">Cómo funciona</Link>
+          <Link to="/about" className="landing__link--active">
+            Acerca de
+          </Link>
+        </nav>
 
-  <Link to="/login" className="landing__btn landing__btn--small">
-    Iniciar sesión
-  </Link>
-</header>
+        <Link to="/login" className="landing__btn landing__btn--small">
+          Iniciar sesión
+        </Link>
+      </header>
 
       <main className="about__container">
         {/* ---------- Hero ---------- */}
@@ -119,10 +119,10 @@ export function About({ backTo = "/" }: Props) {
             </p>
 
             <p className="about__lead">
-              SIGEC es una plataforma web para administrar locales, oficinas y
-              bodegas, atender solicitudes de interesados y automatizar las
-              listas de espera, con un acceso distinto para clientes y
-              administradores.
+              SIGEC es una plataforma web diseñada para facilitar la administración de locales,
+              oficinas y bodegas.Permite consultar los espacios disponibles, registrar el interés de
+              las personas y organizar el seguimiento de las solicitudes mediante listas de espera, manteniendo
+              la información centralizada y facilitando la gestión de los espacios comerciales.
             </p>
           </div>
 

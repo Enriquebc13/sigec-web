@@ -7,6 +7,8 @@ import "./RequestModal.css";
 type Props = {
   propertyId: string;
   propertyTitle: string;
+  /** La propiedad está reservada: la solicitud entra a la lista de espera */
+  joinsWaitlist?: boolean;
   onClose: () => void;
   /** Se llama en cuanto la solicitud se envió, para actualizar las tarjetas */
   onSent: (propertyId: string) => void;
@@ -15,6 +17,7 @@ type Props = {
 export function RequestModal({
   propertyId,
   propertyTitle,
+  joinsWaitlist = false,
   onClose,
   onSent,
 }: Props) {
@@ -60,7 +63,7 @@ export function RequestModal({
             </h2>
             <p className="rmodal__text rmodal__text--center">
               Un administrador revisará tu solicitud y se pondrá en contacto
-              contigo.
+              contigo. Puedes ver tu lugar en «Lista de espera».
             </p>
 
             <dl className="rmodal__summary">
@@ -76,6 +79,12 @@ export function RequestModal({
                 <dt>Estado</dt>
                 <dd>{REQUEST_STATUS_LABELS[created.status]}</dd>
               </div>
+              {created.posicionListaEspera !== null && (
+                <div>
+                  <dt>Lista de espera</dt>
+                  <dd>Lugar #{created.posicionListaEspera}</dd>
+                </div>
+              )}
               <div>
                 <dt>Enviada</dt>
                 <dd>
@@ -115,6 +124,13 @@ export function RequestModal({
             <p className="rmodal__text">
               Vas a enviar una solicitud para <strong>{propertyTitle}</strong>.
             </p>
+            {joinsWaitlist && (
+              <p className="rmodal__hint">
+                Esta propiedad está reservada por el momento. Tu solicitud
+                entrará a la lista de espera y podrás ver tu lugar en «Lista de
+                espera».
+              </p>
+            )}
 
             <form onSubmit={handleSubmit}>
               <label className="rmodal__label" htmlFor="rmodal-phone">

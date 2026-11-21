@@ -1,0 +1,32 @@
+/* Oculto hasta que entra en pantalla */
+.reveal {
+  opacity: 0;
+}
+
+/* Al entrar, anima. "backwards" mantiene el estado inicial durante el retraso
+   y, al terminar, devuelve el control al CSS normal del elemento
+   (así no se rompen los hover ni las transiciones de tus tarjetas). */
+.reveal--visible {
+  opacity: 1;
+  animation: reveal-in 0.65s ease-out backwards;
+  animation-delay: var(--reveal-delay, 0s);
+}
+
+@keyframes reveal-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .reveal--visible {
+    opacity: 1;
+    animation: none;
+  }
+}

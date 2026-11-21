@@ -1,4 +1,5 @@
 import type {
+  AutoRejectedRequest,
   PropertyAddress,
   PropertyId,
   PropertyStatus,
@@ -29,4 +30,9 @@ export interface PropertyDetailResponseDto {
   userId: string;
   address: PropertyAddress;
   images: PropertyImageResponseDto[];
+}
+
+/** Respuesta de PUT /properties/:id: la propiedad más las solicitudes rechazadas automáticamente */
+export interface UpdatePropertyResponseDto extends PropertyDetailResponseDto {
+  autoRejectedRequests?: AutoRejectedRequest[];
 }

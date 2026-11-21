@@ -15,8 +15,14 @@ import { PropertiesView } from "./modules/properties/presentation/admin/Properti
 import { ListRequestHistoryView } from "./modules/requests/presentation/admin/ListRequestHistoryView";
 import { ClientPropertiesView } from "./modules/properties/presentation/client/ClientPropertiesView";
 import { MyRequestsView } from "./modules/requests/presentation/client/MyRequestsView";
+import { ClientWaitlistView } from "./modules/requests/presentation/client/ClientWaitlistView";
+import { AdminWaitlistView } from "./modules/requests/presentation/admin/AdminWaitlistView";
 import ReportsView from "./modules/reports/presentation/admin/ReportsView";
+import RequestsReportsView from "./modules/reports/presentation/admin/RequestsReportsView";
 import { ClientAbout } from "./modules/landing/presentation/pages/ClientAbout";
+import UsersReportsView from "./modules/reports/presentation/admin/UsersReportsView";
+import PropertiesReportsView from "./modules/reports/presentation/admin/PropertiesReportsView";
+
 
 
 function App() {
@@ -40,6 +46,7 @@ function App() {
             <Route path="/client/profile" element={<ClientProfileView />} />
             <Route path="/client/ClientAbout" element={<ClientAbout/>} />
             <Route path="/client/requests" element={<MyRequestsView />} />
+            <Route path="/client/waitlist" element={<ClientWaitlistView />} />
             <Route path="/client/properties" element={<ClientPropertiesView />} />
           </Route>
 
@@ -51,7 +58,12 @@ function App() {
             <Route path="/admin/users" element={<ListUsersView />} />
             <Route path="/admin/properties" element={<PropertiesView />} />
             <Route path="/admin/requests" element={<ListRequestHistoryView />} />
+            <Route path="/admin/waitlist" element={<AdminWaitlistView />} />
+            {/* REPORTES */}
             <Route path="/admin/reports" element={<ReportsView />} />
+            <Route path="/admin/reports/users" element={< UsersReportsView/>} />
+            <Route path="/admin/reports/requests" element={<RequestsReportsView />} />
+            <Route path="/admin/reports/properties" element={<PropertiesReportsView />} />
           </Route>
 
           <Route path="*" element={<Navigate to="/" replace />} />

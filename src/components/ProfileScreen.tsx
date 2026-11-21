@@ -20,6 +20,8 @@ type Props = {
   sessionExpiresAt?: Date | null;
   detailsLoading?: boolean;
   detailsError?: string | null;
+  /** Contenido extra debajo de los datos de la cuenta (por ejemplo, propiedades rentadas) */
+  extra?: ReactNode;
 };
 
 const dateOnly = (date: Date) =>
@@ -62,6 +64,7 @@ export function ProfileScreen({
   sessionExpiresAt,
   detailsLoading = false,
   detailsError = null,
+  extra,
 }: Props) {
   const [confirming, setConfirming] = useState(false);
   // Date.now() en el inicializador: se calcula una sola vez al montar
@@ -137,6 +140,8 @@ export function ProfileScreen({
             </button>
           </div>
         </div>
+
+        {extra}
       </section>
 
       {confirming && (

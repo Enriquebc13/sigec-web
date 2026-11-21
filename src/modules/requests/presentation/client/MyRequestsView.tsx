@@ -4,19 +4,18 @@ import { ConfirmDialog } from "../../../../components/ConfirmDialog";
 import { useAuth } from "../../../auth/presentation/hooks/useAuth";
 import { useProperties } from "../../../properties/presentation/admin/hooks/use-properties";
 import type { PropertyRequest } from "../../domain/entities/request.entity";
+import { EditPhoneModal } from "./components/EditPhoneModal";
 import { RequestCard } from "./components/RequestCard";
+import { useCancelRequest } from "./hooks/use-cancel-request";
 import { useDeleteRequest } from "./hooks/use-delete-request";
 import { useMyRequests } from "./hooks/use-my-requests";
 import "./MyRequestsView.css";
 import { GlowScreen } from "../../../../components/GlowScreen";
 import { RoleNav } from "../../../auth/presentation/components/RoleNav";
 
-// Texto del diálogo según cómo terminó la solicitud
+// Solo las solicitudes rechazadas se pueden eliminar (las aprobadas tienen la
+// propiedad reservada y las pendientes ocupan un lugar en la lista de espera)
 const deleteCopy = {
-  APPROVED: (name: string) => ({
-    title: "Eliminar solicitud aprobada",
-    message: `Tu solicitud para «${name}» fue aprobada. Si la eliminas, desaparecerá de tu lista y no podrás recuperarla. ¿Quieres continuar?`,
-  }),
   REJECTED: (name: string) => ({
     title: "Eliminar solicitud rechazada",
     message: `Tu solicitud para «${name}» fue rechazada. ¿Quieres quitarla de tu lista? Esta acción no se puede deshacer.`,
@@ -34,11 +33,31 @@ export function MyRequestsView() {
     reset: resetDelete,
   } = useDeleteRequest();
 
+  const {
+    cancel,
+    loading: cancelling,
+    error: cancelError,
+    reset: resetCancel,
+  } = useCancelRequest();
+
   const [toDelete, setToDelete] = useState<{
     request: PropertyRequest;
     name: string;
   } | null>(null);
+  const [toCancel, setToCancel] = useState<{
+    request: PropertyRequest;
+    name: string;
+  } | null>(null);
+  const [toEditPhone, setToEditPhone] = useState<{
+    request: PropertyRequest;
+    name: string;
+  } | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+
+  const showNotice = (message: string) => {
+    setNotice(message);
+    window.setTimeout(() => setNotice(null), 3000);
+  };
 
   // id de propiedad → propiedad (de aquí salen el nombre y la imagen)
   const propertiesById = useMemo(
@@ -62,16 +81,36 @@ export function MyRequestsView() {
     const ok = await remove(request.id, request.status);
     if (ok) {
       setToDelete(null);
-      setNotice("Solicitud eliminada correctamente");
-      window.setTimeout(() => setNotice(null), 3000);
+      showNotice("Solicitud eliminada correctamente");
       reload();
     }
   };
 
-  // Solo las aprobadas o rechazadas llegan al diálogo
+  const askCancel = (request: PropertyRequest, name: string) => {
+    resetCancel();
+    setToCancel({ request, name });
+  };
+
+  const dismissCancel = () => {
+    resetCancel();
+    setToCancel(null);
+  };
+
+  const confirmCancel = async () => {
+    if (!toCancel) return;
+    const { request } = toCancel;
+    const ok = await cancel(request.id, request.status);
+    if (ok) {
+      setToCancel(null);
+      showNotice("Solicitud cancelada. Saliste de la lista de espera");
+      reload();
+    }
+  };
+
+  // Solo las rechazadas llegan al diálogo
   const copy =
-    toDelete && toDelete.request.status !== "PENDING"
-      ? deleteCopy[toDelete.request.status](toDelete.name)
+    toDelete && toDelete.request.status === "REJECTED"
+      ? deleteCopy.REJECTED(toDelete.name)
       : null;
 
   return (
@@ -136,12 +175,46 @@ export function MyRequestsView() {
                   propertiesLoading={propertiesLoading}
                   applicant={user?.email}
                   onDelete={askDelete}
+                  onCancel={askCancel}
+                  onEditPhone={(r, name) => setToEditPhone({ request: r, name })}
                 />
               ))}
             </div>
           </>
         )}
       </section>
+
+      {toCancel && (
+        <ConfirmDialog
+          title="Cancelar solicitud"
+          message={`¿Seguro que quieres cancelar tu solicitud para «${toCancel.name}»?${
+            toCancel.request.posicionListaEspera !== null
+              ? ` Saldrás de la lista de espera (lugar #${toCancel.request.posicionListaEspera}).`
+              : ""
+          } Si cambias de opinión, tendrás que enviar una nueva solicitud y quedarás al final de la fila.`}
+          confirmLabel="Sí, cancelar solicitud"
+          cancelLabel="Volver"
+          danger
+          loading={cancelling}
+          error={cancelError}
+          onConfirm={confirmCancel}
+          onCancel={dismissCancel}
+        />
+      )}
+
+      {toEditPhone && (
+        <EditPhoneModal
+          key={toEditPhone.request.id}
+          request={toEditPhone.request}
+          propertyTitle={toEditPhone.name}
+          onClose={() => setToEditPhone(null)}
+          onSaved={() => {
+            setToEditPhone(null);
+            showNotice("Teléfono actualizado correctamente");
+            reload();
+          }}
+        />
+      )}
 
       {copy && (
         <ConfirmDialog

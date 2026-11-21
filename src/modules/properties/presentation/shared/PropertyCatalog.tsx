@@ -1,12 +1,17 @@
 import { useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../../../auth/presentation/hooks/useAuth";
-import type { RequestStatus } from "../../../requests/domain/entities/request-history.entity";
+import type { PropertyRequest } from "../../../requests/domain/entities/request.entity";
 import { RequestModal } from "../../../requests/presentation/client/components/RequestModal";
 import { useMyRequests } from "../../../requests/presentation/client/hooks/use-my-requests";
 import type { Property } from "../../domain/entities/property.entity";
 import { useProperties } from "../admin/hooks/use-properties";
 import { ListPropertiesView } from "../admin/ListPropertiesView";
+
+// Se puede solicitar una propiedad disponible o reservada (en ese caso la
+// solicitud entra a la lista de espera). Rentada o no disponible: no.
+const canRequest = (property: Property) =>
+  property.status === "AVAILABLE" || property.status === "RESERVED";
 
 /**
  * Catálogo con el botón "Me interesa". Se comporta según quién lo vea:
@@ -36,12 +41,12 @@ export function PropertyCatalog() {
   const focusId = searchParams.get("property") ?? undefined;
   const wantsToRequest = searchParams.get("solicitar") === "1";
 
-  // id de propiedad → estado de su solicitud más reciente (la primera gana)
-  const statusByProperty = useMemo(() => {
-    const map = new Map<string, RequestStatus>();
+  // id de propiedad → su solicitud más reciente (la primera gana)
+  const requestByProperty = useMemo(() => {
+    const map = new Map<string, PropertyRequest>();
     for (const request of requests) {
       if (!map.has(request.propertyId)) {
-        map.set(request.propertyId, request.status);
+        map.set(request.propertyId, request);
       }
     }
     return map;
@@ -58,11 +63,11 @@ export function PropertyCatalog() {
     !requestsLoading
   ) {
     const property = properties.find((p) => p.id === focusId);
-    const status = statusByProperty.get(focusId);
+    const status = requestByProperty.get(focusId)?.status;
     setAutoOpened(true);
     if (
       property &&
-      property.status === "AVAILABLE" &&
+      canRequest(property) &&
       status !== "PENDING" &&
       status !== "APPROVED"
     ) {
@@ -101,10 +106,11 @@ export function PropertyCatalog() {
   const renderAction = (property: Property) => {
     if (isAdmin) return null;
 
-    const requestStatus = isClient
-      ? statusByProperty.get(property.id)
-      : undefined;
-    const available = property.status === "AVAILABLE";
+    const myRequest = isClient ? requestByProperty.get(property.id) : undefined;
+    const requestStatus = myRequest?.status;
+    const available = canRequest(property);
+    const reserved = property.status === "RESERVED";
+    const rented = property.status === "RENTED";
 
     if (requestStatus === "PENDING") {
       return (
@@ -113,7 +119,9 @@ export function PropertyCatalog() {
           className="pcard__btn pcard__btn--pending"
           disabled
         >
-          ⏳ Solicitud pendiente
+          {myRequest?.posicionListaEspera != null
+            ? `⏳ Pendiente · Lugar #${myRequest.posicionListaEspera}`
+            : "⏳ Solicitud pendiente"}
         </button>
       );
     }
@@ -121,7 +129,7 @@ export function PropertyCatalog() {
     if (requestStatus === "APPROVED") {
       return (
         <button type="button" className="pcard__btn pcard__btn--done" disabled>
-          ✓ Solicitud aprobada
+          {rented ? "🏠 Rentada por ti" : "✓ Solicitud aprobada"}
         </button>
       );
     }
@@ -133,7 +141,9 @@ export function PropertyCatalog() {
           className="pcard__btn pcard__btn--retry"
           onClick={() => handleInterested(property)}
         >
-          Rechazada · Volver a solicitar
+          {myRequest?.cancelledByApplicant
+            ? "Cancelada · Volver a solicitar"
+            : "Rechazada · Volver a solicitar"}
         </button>
       ) : (
         <button
@@ -141,7 +151,9 @@ export function PropertyCatalog() {
           className="pcard__btn pcard__btn--retry"
           disabled
         >
-          Solicitud rechazada
+          {myRequest?.cancelledByApplicant
+            ? "Solicitud cancelada"
+            : "Solicitud rechazada"}
         </button>
       );
     }
@@ -149,7 +161,7 @@ export function PropertyCatalog() {
     if (!available) {
       return (
         <button type="button" className="pcard__btn" disabled>
-          No disponible
+          {rented ? "Rentada" : "No disponible"}
         </button>
       );
     }
@@ -160,7 +172,7 @@ export function PropertyCatalog() {
         className="pcard__btn"
         onClick={() => handleInterested(property)}
       >
-        Me interesa
+        {reserved ? "Unirme a la lista de espera" : "Me interesa"}
       </button>
     );
   };
@@ -183,6 +195,7 @@ export function PropertyCatalog() {
           key={selected.id}
           propertyId={selected.id}
           propertyTitle={selected.title}
+          joinsWaitlist={selected.status === "RESERVED"}
           onClose={closeModal}
           onSent={() => reloadRequests()}
         />

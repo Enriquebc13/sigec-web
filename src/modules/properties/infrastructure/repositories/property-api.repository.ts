@@ -1,8 +1,13 @@
 import { apiClient } from "../../../../core/http/api-client";
 import type { CreatePropertyDto } from "../../application/dtos/create-property.dto";
 import type { PropertyDetailResponseDto } from "../../application/dtos/property-detail-response.dto";
+import type { UpdatePropertyResponseDto } from "../../application/dtos/property-detail-response.dto";
 import type { UpdatePropertyDto } from "../../application/dtos/update-property.dto";
-import type { Property, PropertyId } from "../../domain/entities/property.entity";
+import type {
+  Property,
+  PropertyId,
+  UpdatePropertyResult,
+} from "../../domain/entities/property.entity";
 import type { PropertyRepository } from "../../domain/interfaces/property.repository";
 
 // Convierte lo que manda la API (decimales y fechas como texto) en la entidad
@@ -37,13 +42,21 @@ export class PropertyApiRepository implements PropertyRepository {
     });
     return created.id;
   }
-  async update(id: PropertyId, dto: UpdatePropertyDto): Promise<Property> {
+  async update(
+    id: PropertyId,
+    dto: UpdatePropertyDto,
+  ): Promise<UpdatePropertyResult> {
     // Solo ADMIN. Aunque es PUT, todos los campos son opcionales: se manda lo que cambió
-    const data = await apiClient<PropertyDetailResponseDto>(
-      `/properties/${id}`,
-      { method: "PUT", body: dto },
-    );
-    return toProperty(data);
+    const { autoRejectedRequests, ...detail } =
+      await apiClient<UpdatePropertyResponseDto>(`/properties/${id}`, {
+        method: "PUT",
+        body: dto,
+      });
+    return {
+      property: toProperty(detail),
+      // Viene vacío (o ausente) si el cambio no rechazó ninguna solicitud
+      autoRejectedRequests: autoRejectedRequests ?? [],
+    };
   }
 
   async delete(id: PropertyId): Promise<void> {

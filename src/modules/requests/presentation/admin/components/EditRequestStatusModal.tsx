@@ -1,5 +1,8 @@
 import { useEffect, useState, type FormEvent } from "react";
-import type { DecisionStatus } from "../../../domain/entities/request.entity";
+import {
+  allowedDecisions,
+  type DecisionStatus,
+} from "../../../domain/entities/request.entity";
 import type { RequestStatus } from "../../../domain/entities/request-history.entity";
 import { useUpdateRequestStatus } from "../hooks/use-update-request-status";
 import { REQUEST_STATUS_LABELS } from "../request-labels";
@@ -25,12 +28,14 @@ const OPTIONS: {
   {
     value: "APPROVED",
     title: "Aprobar",
-    description: "Se acepta la solicitud del cliente.",
+    description:
+      "Se acepta la solicitud y la propiedad pasa a «Reservada». Las demás solicitudes siguen en la lista de espera.",
   },
   {
     value: "REJECTED",
     title: "Rechazar",
-    description: "Se descarta la solicitud del cliente.",
+    description:
+      "Se descarta la solicitud. El siguiente de la fila pasa a ser el primero. Si estaba aprobada, la propiedad vuelve a «Disponible».",
   },
 ];
 
@@ -46,6 +51,10 @@ export function EditRequestStatusModal({
 }: Props) {
   const { update, loading, error } = useUpdateRequestStatus();
   const [selected, setSelected] = useState<DecisionStatus | null>(null);
+
+  // La API solo permite ciertos cambios desde cada estado (una rechazada no se reabre)
+  const allowed = allowedDecisions(currentStatus);
+  const options = OPTIONS.filter((option) => allowed.includes(option.value));
 
   // Cerrar con Escape (no mientras se guarda)
   useEffect(() => {
@@ -122,19 +131,28 @@ export function EditRequestStatusModal({
           </div>
         )}
 
-        {currentStatus !== "PENDING" && (
+        {currentStatus === "APPROVED" && (
           <p className="smodal__hint">
-            Esta solicitud ya está{" "}
-            {REQUEST_STATUS_LABELS[currentStatus].toLowerCase()}. Puedes cambiar
-            la decisión.
+            Esta solicitud está aprobada. Si el trato no se concreta, puedes
+            rechazarla y la propiedad volverá a estar disponible.
+          </p>
+        )}
+        {currentStatus === "REJECTED" && (
+          <p className="smodal__hint">
+            Esta solicitud ya fue rechazada y no se puede reabrir. El cliente
+            puede enviar una nueva solicitud.
           </p>
         )}
 
         <form onSubmit={handleSubmit}>
-          <fieldset className="smodal__options" disabled={loading}>
+          <fieldset
+            className="smodal__options"
+            disabled={loading}
+            hidden={options.length === 0}
+          >
             <legend className="smodal__legend">Nuevo estado</legend>
 
-            {OPTIONS.map((option) => {
+            {options.map((option) => {
               const isCurrent = option.value === currentStatus;
               const isSelected = selected === option.value;
 
@@ -183,7 +201,7 @@ export function EditRequestStatusModal({
             <button
               type="submit"
               className="smodal__btn"
-              disabled={loading || !selected}
+              disabled={loading || !selected || options.length === 0}
             >
               {loading ? "Guardando..." : "Guardar cambio"}
             </button>

@@ -1,0 +1,62 @@
+/* Complementos para la pantalla de reportes de solicitudes
+   (los estilos base vienen de ReportsShared.css) */
+.rr__back {
+  display: inline-block;
+  margin-bottom: 14px;
+  font-size: 14px;
+  color: var(--color-text-muted);
+  text-decoration: none;
+}
+
+.rr__back:hover {
+  color: var(--color-text);
+}
+
+.rr__hint {
+  margin: -8px 0 18px;
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.rr__group {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.rr__group-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.rr__group-title {
+  margin: 0;
+  font-size: 17px;
+}
+
+.rr__tag {
+  padding: 3px 12px;
+  border-radius: var(--radius-pill);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.06);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.rr__muted {
+  margin: 0;
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.rr__progress {
+  margin: 0 0 10px;
+  padding: 8px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(74, 155, 148, 0.7);
+  background: rgba(74, 155, 148, 0.18);
+  font-size: 14px;
+}

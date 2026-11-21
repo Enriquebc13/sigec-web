@@ -3,12 +3,13 @@ import type { Role } from "../../domain/entities/AuthUser";
 import { HOME_BY_ROLE } from "../home-by-role";
 import { useAuth } from "../hooks/useAuth";
 
-// Solo rutas que existen hoy; "Lista de espera" se agrega cuando haya pantalla
+// Solo rutas que existen hoy
 const NAV_LINKS: Record<Role, NavItem[]> = {
   CLIENT: [
     { label: "Inicio", to: "/client/home" },
     { label: "Catálogo", to: "/client/properties" },
     { label: "Mis solicitudes", to: "/client/requests" },
+    { label: "Lista de espera", to: "/client/waitlist" },
     { label: "Perfil", to: "/client/profile" },
   ],
   ADMIN: [
@@ -16,6 +17,7 @@ const NAV_LINKS: Record<Role, NavItem[]> = {
     { label: "Usuarios", to: "/admin/users" },
     { label: "Propiedades", to: "/admin/properties" },
     { label: "Solicitudes", to: "/admin/requests" },
+    { label: "Listas de espera", to: "/admin/waitlist" },
     { label: "Reportes", to: "/admin/reports" },
     { label: "Perfil", to: "/admin/profile" },
     
